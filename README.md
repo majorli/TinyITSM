@@ -94,3 +94,4 @@ It also provides a tiny IT knowledgebase to store and get documents.
 <br>
 3. Struts2+Hibernate4+Spring4<br>
 3. Log4j2<br>
+4. Hibernate Search and Lucene<br>
