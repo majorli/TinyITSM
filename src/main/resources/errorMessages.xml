@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+<properties>
+	<comment>errXXX[错误信息，不能有占位符],errXXX.tCount[错误提示行数],errXXX.pCount[占位符总数],tipXXX.YYY[错误提示]",tipXXX.YYY.pCount[本行提示中的占位符数],数量为0可以不写</comment>
+	
+	<entry key="err0">未知类型的错误！</entry>
+	<entry key="err0.tCount">1</entry>
+	<entry key="tip0.0">请联系系统管理员或运维人员排查错误。</entry>
+
+	<entry key="err1">功能模块访问错误！</entry>
+	<entry key="err1.tCount">2</entry>
+	<entry key="err1.pCount">1</entry>
+	<entry key="tip1.0">请求访问的功能模块（代码：{0}）并不存在。</entry>
+	<entry key="tip1.0.pCount">1</entry>
+	<entry key="tip1.1">请不要手动输入地址来尝试访问系统特定功能模块。</entry>
+	
+	<entry key="err2">上传文件的大小或类型不正确！</entry>
+	<entry key="err2.tCount">3</entry>
+	<entry key="tip2.0">单个上传的文件大小不能超过100M。</entry>
+	<entry key="tip2.1">每次上传的文件总大小不能超过1G。</entry>
+	<entry key="tip2.2">如果是批量数据导入，则必须上传微软Excel文件(.xls, .xlsx)，不接受其他类型的文件。</entry>
+
+	<entry key="err3">修改用户名时发生错误！</entry>
+	<entry key="err3.tCount">2</entry>
+	<entry key="tip3.0">服务器内部错误，原因未明。</entry>
+	<entry key="tip3.1">请联系系统管理员进行检查。</entry>
+	
+	<entry key="err4">无法获取下载的文件！</entry>
+	<entry key="err4.tCount">1</entry>
+	<entry key="tip4.0">文件可能被损坏或删除，或已经失去访问权限。</entry>
+</properties>

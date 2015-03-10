@@ -1,0 +1,202 @@
+input::-ms-clear {
+	display: none;
+}
+
+* {
+	font-family: Tahoma, Arial, Verdana, sans-serif;
+	font-size: 12px;
+	outline-style: none;
+}
+
+body {
+	color: #202020;
+	width: 1264px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+a {
+	text-decoration: none;
+	color: #404040;
+}
+
+a:hover {
+	color: #FF8000;
+}
+
+}
+a:hover, a:focus {
+	outline-style: none;
+}
+
+a:active {
+	background-color: transparent;
+}
+/* h1 is usually a paragraph title */
+h1 {
+	font-size: 16px;
+	color: #0099FF;
+}
+/* h2 is usually an error message in red */
+h2 {
+	padding-left: 1em;
+	color: #FF0000;
+}
+
+/* h3 is usually an error message's tip text */
+h3 {
+	padding-left: 4em;
+	font-weight: normal;
+	margin: .25em 0;
+}
+
+/* h4 is usually a page's highlight text */
+h4 {
+	color: #ff8000;
+	font-weight: bold;
+	text-shadow: 1px 1px 1px #C0C0C0;
+	margin: 8px 0;
+}
+/* h5 is usually a panel(or other block component)'s highlight text */
+h5 {
+	font-weight: bold;
+	font-size: 12px;
+	text-shadow: 1px 1px 1px #C0C0C0;
+	text-align: center;
+	margin: 0 0 10px 0;
+}
+
+.Heiti {
+	font-family: Tahoma, Arial, Verdana, "Hiragino Sans GB", "simhei", "WenQuanYi Micro Hei", sans-serif;
+}
+
+div.Title {
+	color: #000080;
+	text-align: center;
+	padding-top: 16px;
+	padding-bottom: 8px;
+}
+
+#appTitle {
+	font-size: 24px;
+	text-shadow: 2px 2px 2px #808080;
+}
+
+#appVersion {
+	font-size: 20px;
+	font-style: italic;
+}
+
+div.Header {
+	color: #176EAC;
+	background-color: #D3D3D3;
+	border: 1px outset #E0E0FF;
+	text-shadow: 1px 1px 1px #8080C0;
+	padding: 6px 30px 4px 30px;
+}
+
+Div.Header a {
+	color: #123456;
+}
+
+Div.Header a:hover {
+	color: #FFFFE0;
+}
+
+div.Footer {
+	text-align: center;
+	padding-top: .5em;
+}
+
+div.Footer span {
+	color: #000040;
+}
+
+div.Container {
+	background-color: #F5F5F5;
+	border-bottom: 2px #F0F0F0 ridge;
+	padding: 1em;
+}
+
+input[type=checkbox] {
+	margin-right: 3px;
+	vertical-align: -2px;
+}
+
+div.Line {
+	margin-bottom: 20px;
+	width: 100%;
+}
+
+div.MidLine {
+	margin-bottom: 1em;
+	width: 100%;
+}
+
+div.TinyLine {
+	margin-bottom: .5em;
+	width: 100%;
+}
+
+div.Line>div, div.MidLine>div, div.TinyLine>div {
+	padding: 0 0 .5em .25em;
+}
+
+#navi {
+	padding: 1px;
+	min-height: 520px;
+	float: left;
+	width: 190px;
+}
+
+#wpad {
+	padding: 1px;
+	border: 1px outset #C0C0C0;
+	min-height: 520px;
+	background-color: #FFFFFF;
+	margin-left: 200px;
+}
+
+span.Tag {
+	display: inline-block;
+	padding: 4px 8px 4px 24px;
+	margin: 0 8px 8px 0;
+	border: 1px outset #E0E0E0;
+	border-radius: 4px;
+	cursor: pointer;
+	background: #F0F0F0 url("ext-icons/tickets.png") no-repeat 4px center;
+}
+
+span.DelTag {
+	background: #FFFFFF url("ext-icons/minus.png") no-repeat 4px center;
+}
+
+span.AddTag {
+	background: #FFFFFF url("ext-icons/plus.png") no-repeat 4px center;
+}
+
+.Red {
+	color: red;
+}
+
+dl.Notes {
+	padding-right: 1em;
+}
+dl.Notes dt {
+	text-shadow: 1px 1px 1px #C0C0C0;
+	font-weight: bold;
+	margin-left: 1em;
+	cursor: default;
+}
+dl.Notes dd span {
+	text-shadow: 1px 1px 1px #C0C0C0;
+}
+dl.Notes dd {
+	padding: 2px 0;
+	margin-top:2px;
+	margin-bottom:2px;
+	border-bottom: 1px dotted #808080;
+	cursor: default;
+}
