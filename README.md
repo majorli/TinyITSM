@@ -89,7 +89,8 @@ It also provides a tiny IT knowledgebase to store and get documents.
       ...
     ```
   1.2 Database - mysql5.6<br>
-  It's recommended that remain the Hibernate property "hibernate.hbm2ddl.auto" with value of "auto", so that Hibernate will create all of the tables needed when you launche tomcat the first time after the applications is deployed. After that, delete or comment off this property immediatly, import initial data using "companies.sql", then reload application.
+  It's recommended that remain the Hibernate property "hibernate.hbm2ddl.auto" with value of "auto", so that Hibernate will create all of the tables needed when you launche tomcat the first time after the applications is deployed. After that, delete or comment off this property immediatly, import initial data using "companies.sql", then reload application.<br>
+  Note: MySQL connector/J package (mysql-connector-java-5.1.34.jar) should be put into {TOMCAT_HOME}/lib/.<br>
 <br>
 3. Struts2+Hibernate4+Spring4<br>
 3. Log4j2<br>
