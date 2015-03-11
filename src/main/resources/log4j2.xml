@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="off">
+	<Appenders>
+		<Console name="ItsmConsole" target="SYSTEM_OUT">
+			<PatternLayout>
+				<Pattern>[%p][%d{yyyy-MM-dd HH:mm:ss,SSS}] - %m%n</Pattern>
+			</PatternLayout>
+		</Console>
+		<RollingFile name="ItsmLogFile" fileName="E:/TinyITSM/logs/tinyitsm.log" filePattern="E:/TinyITSM/logs/tinyitsm-%d{MM-dd-yyyy}-%i.log">
+			<PatternLayout>
+				<Pattern>[%p][%d{yyyy-MM-dd HH:mm:ss,SSS}] - %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="5 MB" />
+			</Policies>
+			<DefaultRolloverStrategy min="1" max="99" />
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Root level="error">
+			<Appender-ref ref="ItsmConsole" />
+		</Root>
+		<Logger name="com.jeans.tinyitsm" level="info" additivity="false">
+			<Appender-ref ref="ItsmLogFile" />
+			<Appender-ref ref="ItsmConsole" />
+		</Logger>
+	</Loggers>
+</Configuration>

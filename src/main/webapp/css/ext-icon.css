@@ -1,0 +1,314 @@
+/* custom icons in ext-icons folder */
+.icon-employee {
+	background: url('ext-icons/user.png') no-repeat center center;
+}
+
+.icon-department {
+	background: url('ext-icons/group.png') no-repeat center center;
+}
+
+.icon-company {
+	background: url('ext-icons/house.png') no-repeat center center;
+}
+
+.icon-settings {
+	background: url('ext-icons/settings.png') no-repeat center center;
+}
+
+.icon-add-employee {
+	background: url('ext-icons/user_add.png') no-repeat center center;
+}
+
+.icon-remove-employee {
+	background: url('ext-icons/user_delete.png') no-repeat center center;
+}
+
+.icon-plus {
+	background: url('ext-icons/plus.png') no-repeat center center;
+}
+
+.icon-forbid {
+	background: url('ext-icons/forbid.png') no-repeat center center;
+}
+
+.icon-minus {
+	background: url('ext-icons/minus.png') no-repeat center center;
+}
+
+.icon-multiple {
+	background: url('ext-icons/multiple.png') no-repeat center center;
+}
+
+.icon-go-up {
+	background: url('ext-icons/go-up.png') no-repeat center center;
+}
+
+.icon-go-down {
+	background: url('ext-icons/go-down.png') no-repeat center center;
+}
+
+.icon-go-head {
+	background: url('ext-icons/go-head.png') no-repeat center center;
+}
+
+.icon-go-tail {
+	background: url('ext-icons/go-tail.png') no-repeat center center;
+}
+
+.icon-error {
+	background: url('ext-icons/error.png') no-repeat center center;
+}
+
+.icon-information {
+	background: url('ext-icons/information.png') no-repeat center center;
+}
+
+.icon-exclamation {
+	background: url('ext-icons/exclamation.png') no-repeat center center;
+}
+
+.icon-saved {
+	background: url('ext-icons/saved.png') no-repeat center center;
+}
+
+.icon-tickets {
+	background: url('ext-icons/tickets.png') no-repeat center center;
+}
+
+.icon-rotate {
+	background: url('ext-icons/rotate.png') no-repeat center center;
+}
+
+.icon-refresh {
+	background: url('ext-icons/refresh.png') no-repeat center center;
+}
+
+.icon-cart {
+	background: url('ext-icons/cart.png') no-repeat center center;
+}
+
+.icon-key {
+	background: url('ext-icons/key.png') no-repeat center center;
+}
+
+.icon-logo {
+	background: url('ext-icons/jeans.png') no-repeat center center;
+}
+
+.icon-arrow-up {
+	background: url('ext-icons/arrow-up.png') no-repeat center center;
+}
+.icon-arrow-down {
+	background: url('ext-icons/arrow-down.png') no-repeat center center;
+}
+.icon-arrow-left {
+	background: url('ext-icons/arrow-left.png') no-repeat center center;
+}
+.icon-arrow-right {
+	background: url('ext-icons/arrow-right.png') no-repeat center center;
+}
+
+.icon-cloud {
+	background: url('ext-icons/cloud.png') no-repeat center center;
+}
+.icon-root-file {
+	background: url('ext-icons/root-file.png') no-repeat center center;
+}
+.icon-root-favorites {
+	background: url('ext-icons/root-favorites.png') no-repeat center center;
+}
+.icon-root-rss {
+	background: url('ext-icons/root-rss.png') no-repeat center center;
+}
+.icon-root-push {
+	background: url('ext-icons/root-push.png') no-repeat center center;
+}
+
+.icon-folder {
+	background: url('ext-icons/folder.png') no-repeat center center;
+}
+.icon-folder-rss {
+	background: url('ext-icons/folder-rss.png') no-repeat center center;
+}
+.icon-folder-documents {
+	background: url('ext-icons/folder-documents.png') no-repeat center center;
+}
+.icon-folder-favorites {
+	background: url('ext-icons/folder-favorites.png') no-repeat center center;
+}
+.icon-folder-push {
+	background: url('ext-icons/folder-push.png') no-repeat center center;
+}
+
+.icon-file {
+	background: url('ext-icons/file2.png') no-repeat center center;
+}
+.icon-file-application {
+	background: url('ext-icons/file-application.png') no-repeat center center;
+}
+.icon-file-compress {
+	background: url('ext-icons/file-compress.png') no-repeat center center;
+}
+.icon-file-conf {
+	background: url('ext-icons/file-conf.png') no-repeat center center;
+}
+.icon-file-css {
+	background: url('ext-icons/file-css.png') no-repeat center center;
+}
+.icon-file-database {
+	background: url('ext-icons/file-database.png') no-repeat center center;
+}
+.icon-file-excel {
+	background: url('ext-icons/file-excel.png') no-repeat center center;
+}
+.icon-file-excel97 {
+	background: url('ext-icons/file-excel97.png') no-repeat center center;
+}
+.icon-file-html {
+	background: url('ext-icons/file-html.png') no-repeat center center;
+}
+.icon-file-image {
+	background: url('ext-icons/file-image.png') no-repeat center center;
+}
+.icon-file-iso {
+	background: url('ext-icons/file-iso.png') no-repeat center center;
+}
+.icon-file-link {
+	background: url('ext-icons/file-link.png') no-repeat center center;
+}
+.icon-file-linked {
+	background: url('ext-icons/file-linked.png') no-repeat center center;
+}
+.icon-file-log {
+	background: url('ext-icons/file-log.png') no-repeat center center;
+}
+.icon-file-music {
+	background: url('ext-icons/file-music.png') no-repeat center center;
+}
+.icon-file-pdf {
+	background: url('ext-icons/file-pdf.png') no-repeat center center;
+}
+.icon-file-ppt {
+	background: url('ext-icons/file-ppt.png') no-repeat center center;
+}
+.icon-file-refresh {
+	background: url('ext-icons/file-refresh.png') no-repeat center center;
+}
+.icon-file-script {
+	background: url('ext-icons/file-script.png') no-repeat center center;
+}
+.icon-file-terminal {
+	background: url('ext-icons/file-terminal.png') no-repeat center center;
+}
+.icon-file-txt {
+	background: url('ext-icons/file-txt.png') no-repeat center center;
+}
+.icon-file-video {
+	background: url('ext-icons/file-video.png') no-repeat center center;
+}
+.icon-file-visio {
+	background: url('ext-icons/file-visio.png') no-repeat center center;
+}
+.icon-file-webpage {
+	background: url('ext-icons/file-webpage.png') no-repeat center center;
+}
+.icon-file-word {
+	background: url('ext-icons/file-word.png') no-repeat center center;
+}
+.icon-file-word97 {
+	background: url('ext-icons/file-word97.png') no-repeat center center;
+}
+.icon-file-xml {
+	background: url('ext-icons/file-xml.png') no-repeat center center;
+}
+.icon-file-zip {
+	background: url('ext-icons/file-zip.png') no-repeat center center;
+}
+
+.icon-tlb-delete {
+	background: url('ext-icons/tlb-delete.png') no-repeat center center;
+}
+.icon-tlb-download {
+	background: url('ext-icons/tlb-download.png') no-repeat center center;
+}
+.icon-tlb-favor {
+	background: url('ext-icons/tlb-favor.png') no-repeat center center;
+}
+.icon-tlb-info {
+	background: url('ext-icons/tlb-info.png') no-repeat center center;
+}
+.icon-tlb-move {
+	background: url('ext-icons/tlb-move.png') no-repeat center center;
+}
+.icon-tlb-new-list {
+	background: url('ext-icons/tlb-new-list.png') no-repeat center center;
+}
+.icon-tlb-permission {
+	background: url('ext-icons/tlb-permission.png') no-repeat center center;
+}
+.icon-tlb-private {
+	background: url('ext-icons/tlb-private.png') no-repeat center center;
+}
+.icon-tlb-property {
+	background: url('ext-icons/tlb-property.png') no-repeat center center;
+}
+.icon-tlb-public {
+	background: url('ext-icons/tlb-public.png') no-repeat center center;
+}
+.icon-tlb-push {
+	background: url('ext-icons/tlb-push.png') no-repeat center center;
+}
+.icon-tlb-refuse {
+	background: url('ext-icons/tlb-refuse.png') no-repeat center center;
+}
+.icon-tlb-rename {
+	background: url('ext-icons/tlb-rename.png') no-repeat center center;
+}
+.icon-tlb-rss {
+	background: url('ext-icons/tlb-rss.png') no-repeat center center;
+}
+.icon-tlb-tag {
+	background: url('ext-icons/tlb-tag.png') no-repeat center center;
+}
+.icon-tlb-tip {
+	background: url('ext-icons/tlb-tip.png') no-repeat center center;
+}
+.icon-tlb-update {
+	background: url('ext-icons/tlb-update.png') no-repeat center center;
+}
+.icon-tlb-upload {
+	background: url('ext-icons/tlb-upload.png') no-repeat center center;
+}
+.icon-email-add {
+	background: url('ext-icons/email_add.png') no-repeat center center;
+}
+.icon-email-open {
+	background: url('ext-icons/email_open.png') no-repeat center center;
+}
+.icon-top10-new-files {
+	background: url('ext-icons/top10-new-files.png') no-repeat center center;
+}
+.icon-top10-new-lists {
+	background: url('ext-icons/top10-new-lists.png') no-repeat center center;
+}
+.icon-top10-downloads {
+	background: url('ext-icons/top10-downloads.png') no-repeat center center;
+}
+.icon-table {
+	background: url('ext-icons/table.png') no-repeat center center;
+}
+.icon-table-edit {
+	background: url('ext-icons/table_edit.png') no-repeat center center;
+}
+.icon-table-lightning {
+	background: url('ext-icons/table_lightning.png') no-repeat center center;
+}
+.icon-vcard-add {
+	background: url('ext-icons/vcard_add.png') no-repeat center center;
+}
+.icon-vcard-edit {
+	background: url('ext-icons/vcard_edit.png') no-repeat center center;
+}
+.icon-computer {
+	background: url('ext-icons/computer.png') no-repeat center center;
+}
