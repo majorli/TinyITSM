@@ -17,17 +17,17 @@ It also provides a tiny IT knowledgebase to store and get documents.<br>
 - **Note:** MySQL connector/J package (*mysql-connector-java-5.1.34.jar*) must be put into *{TOMCAT_HOME}/lib/*.
 3. Log4j 2
 - We use **log4j 2** as our logging tool.
-- Configuration file ***log4j2.xml*** for linux server is put in ***deployment/linux/src/main/resources** folder. You should use this file on the server.
+- Configuration file ***log4j2.xml*** for linux server is put in ***deployment/linux/src/main/resources*** folder. You should use this file on the server.
 4. Struts 2
 - **Struts 2.3.16.3** is our web framework.
-- Configuration file ***strust.xml*** for linux server is put in ***deployment/linux/src/main/resources** folder. You should use this file on the server.
+- Configuration file ***strust.xml*** for linux server is put in ***deployment/linux/src/main/resources*** folder. You should use this file on the server.
 5. Hibernate 4
 - **Hibernate 4.3.7.Final** is our ORM framework.
 - Hibernate is integrated with Spring framework, so all configurations of Hibernate are located in ***spring.xml***.
-- Configuration file ***spring.xml*** for linux server is put in ***deployment/linux/src/main/resources** folder. You should use this file on the server.
+- Configuration file ***spring.xml*** for linux server is put in ***deployment/linux/src/main/resources*** folder. You should use this file on the server.
 6. Spring 4
 - **Spring 4.1.3.RELEASE** is our DI framework.
-- Configuration file ***spring.xml*** for linux server is put in ***deployment/linux/src/main/resources** folder. You should use this file on the server.
+- Configuration file ***spring.xml*** for linux server is put in ***deployment/linux/src/main/resources*** folder. You should use this file on the server.
 7. Hibernate Search 5 and Lucene
 - We use **Hibernate Search 5.0.1.Final** with **Apache Lucene** as our fulltext search framework.
 - As of Hibernate ORM, all configurations of Hibernate Search are located in ***spring.xml***.
