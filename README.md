@@ -14,7 +14,7 @@ It also provides a tiny IT knowledgebase to store and get documents.<br>
 2. Database
 - We use **MySQL 5.6** as our database.
 - It's recommended to remain the Hibernate property "hibernate.hbm2ddl.auto" with value "auto", so that Hibernate will create all of the tables needed when you launche tomcat the first time. After that, delete or comment off this property immediately, import initial data using ***deployment/database/companies.sql***, then reload application.
-- **Note:** MySQL connector/J package (*mysql-connector-java-5.1.34.jar*) must be put into *{TOMCAT_HOME}/lib/*.
+- **Note:** MySQL connector/J package (***mysql-connector-java-5.1.34.jar***) must be put into ***{TOMCAT_HOME}/lib/***.
 3. Log4j 2
 - We use **log4j 2** as our logging tool.
 - Configuration file ***log4j2.xml*** for linux server is put in ***deployment/linux/src/main/resources*** folder. You should use this file on the server.
