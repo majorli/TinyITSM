@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:cache="http://www.springframework.org/schema/cache" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:jee="http://www.springframework.org/schema/jee" xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+		http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+	
+	<!-- 使用自动扫包，无需配置此项 -->
+	<!-- <context:annotation-config /> -->
+	
+	<!-- 自动扫描dao, service, component包(自动注入) -->
+	<context:component-scan base-package="com.jeans.tinyitsm.dao,com.jeans.tinyitsm.service,com.jeans.tinyitsm.event.handler" />
+
+	<!-- JNDI数据源 -->
+	<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/tinyitsm"></jee:jndi-lookup>
+	
+	<!-- Hibernate sessionFactory bean -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<!-- Hibernate4和Spring4整合时必须配置Spring的类来管理session上下文，单独使用Hibernate4时该配置属性填写thread即可 -->
+				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
+				<!-- 根据mapping类自动生成数据库表，更新表结构，但是不删除数据，生产环境生成表结构后应删除或注释掉这个配置项 -->
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<!-- 在控制台输出格式化过的SQL语句，生产环境应该设置为false -->
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
+				<!-- Hibernate Search的默认搜索目录提供者，使用文件系统 -->
+				<prop key="hibernate.search.default.directory_provider">filesystem</prop>
+				<!-- Hibernate Search索引根目录，部署到生产环境时需要改变这个配置 -->
+				<prop key="hibernate.search.default.indexBase">/home/lucene/indexes</prop>
+				<!-- Hibernate Search搜索引擎批处理规模 -->
+				<prop key="hibernate.search.worker.batch_size">1000</prop>
+				<!-- Hibernate Search搜索引擎中文分词器 -->
+				<prop key="hibernate.search.analyzer">org.apache.lucene.analysis.cjk.CJKAnalyzer</prop>
+			</props>
+		</property>
+
+		<!-- 自动扫描注解方式配置的hibernate类文件 -->
+		<property name="packagesToScan">
+			<list>
+				<value>com.jeans.tinyitsm.model</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 配置事务管理器 -->
+	<bean name="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<!-- 注解方式配置事物 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+</beans>

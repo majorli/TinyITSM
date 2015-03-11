@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN" "http://struts.apache.org/dtds/struts-2.3.dtd">
+<struts>
+
+	<!-- 指定由spring负责action对象的创建 -->
+	<constant name="struts.objectFactory" value="spring" />
+	<!-- 是否启用开发模式 -->
+	<constant name="struts.devMode" value="false" />
+	<!-- struts配置文件改动后，是否重新加载 -->
+	<constant name="struts.configuration.xml.reload" value="false" />
+	<!-- 设置浏览器是否缓存静态内容 -->
+	<constant name="struts.serve.static.browserCache" value="true" />
+	<!-- 请求参数的编码方式 -->
+	<constant name="struts.i18n.encoding" value="utf-8" />
+	<!-- 每次HTTP请求系统都重新加载资源文件，有助于开发 -->
+	<constant name="struts.i18n.reload" value="false" />
+	<!-- 文件上传最大值，1G -->
+	<constant name="struts.multipart.maxSize" value="1073741824" />
+	<!-- 文件上传的临时目录 -->
+	<constant name="struts.multipart.saveDir" value="/home/tinyitsm/temp" />
+	<!-- 让struts2支持动态方法调用，即Action!method.action的方式调用类中方法 -->
+	<constant name="struts.enable.DynamicMethodInvocation" value="false" />
+	<!-- Action名称中是否可使用斜线 -->
+	<constant name="struts.enable.SlashesInActionNames" value="false" />
+	<!-- 允许标签中使用表达式语法 -->
+	<constant name="struts.tag.altSyntax" value="true" />
+	<!-- 对于WebLogic,Orion,OC4J此属性应该设置成true -->
+	<constant name="struts.dispatcher.parametersWorkaround" value="false" />
+	<!-- 设置项目的根包为自定义的继承于json-default包的jeans-default -->
+	<constant name="struts.convention.default.parent.package" value="jeans-default" />
+	
+	<package name="jeans-default" extends="json-default" namespace="/">
+		<interceptors>
+			<interceptor name="loggingInterceptor" class="com.jeans.tinyitsm.interceptor.LoggingInterceptor" />
+		</interceptors>
+
+	</package>
+</struts>
