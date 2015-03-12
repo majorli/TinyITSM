@@ -279,6 +279,11 @@ $(function() {
 				sel = $("#hardware").datagrid("getSelections");
 				$("#aProps div.SW").hide();
 				$("#aProps div.HW").show();
+				if (sel.length > 1) {
+					$("#p_code,#p_financialCode").hide();
+				} else {
+					$("#p_code,#p_financialCode").show();
+				}
 			} else if (tab == 1) {
 				data.type = 3;
 				sel = $("#software").datagrid("getSelections");
@@ -298,37 +303,66 @@ $(function() {
 			$("#aProps").dialog({
 				"title" : "资产属性[已选" + id.length + "项资产]"
 			});
-			// $.ajax({
-			//				
-			// });
-			$("#aProps").dialog("open");
+			$.ajax({
+				"url" : "asset/load-props",
+				"data" : data,
+				"success" : function(props) {
+					// purchaseTime和expiredTime有可能没有，其他属性都必然会有定义，但有可能是null，所以先清空这两个datebox
+					$("#v_purchaseTime,#v_expiredTime").datebox("clear");
+					for ( var key in props) {
+						if (props[key] == null) {
+							if (key == "purchaseTime" || key == "expiredTime") {
+								$("#v_" + key).datebox("clear");
+							} else if (key == "warranty" || key == "importance" || key == "softwareType") {
+								$("#v_" + key).combobox("clear");
+							} else if (key == "cost" || key == "quantity") {
+								$("#v_" + key).numberspinner("clear");
+							} else {
+								$("#v_" + key).textbox("clear");
+							}
+						} else {
+							if (key == "purchaseTime" || key == "expiredTime") {
+								$("#v_" + key).datebox("setValue", props[key]);
+							} else if (key == "warranty" || key == "importance" || key == "softwareType") {
+								$("#v_" + key).combobox("setValue", props[key]);
+							} else if (key == "cost" || key == "quantity") {
+								$("#v_" + key).numberspinner("setValue", props[key]);
+							} else {
+								$("#v_" + key).textbox("setValue", props[key]);
+							}
+						}
+					}
+					$("#aProps").dialog("open");
+					$("#aProps").scrollTop(0);
+				}
+			});
 		},
 		"sendProps" : function() {
 			alert("sending...");
-//			var data = {
-//				"ids" : "",
-//				"type" : 0,
-//				"props" : {}
-//			};
-//			var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
-//			var sel = [];
-//			if (tab == 0) {
-//				data.type = 1;
-//				sel = $("#hardware").datagrid("getSelections");
-//			} else if (tab == 1) {
-//				data.type = 3;
-//				sel = $("#software").datagrid("getSelections");
-//			} else {
-//				return;
-//			}
-//			if (sel.length == 0) {
-//				return;
-//			}
-//			var id = [];
-//			$.each(sel, function(i, n) {
-//				id.push(n.id);
-//			});
-//			data.ids = id.join();
+			var data = {
+				"ids" : "",
+				"type" : 0,
+				"props" : {}
+			};
+			var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
+			var sel = [];
+			if (tab == 0) {
+				data.type = 1;
+				sel = $("#hardware").datagrid("getSelections");
+			} else if (tab == 1) {
+				data.type = 3;
+				sel = $("#software").datagrid("getSelections");
+			} else {
+				return;
+			}
+			if (sel.length == 0) {
+				return;
+			}
+			var id = [];
+			$.each(sel, function(i, n) {
+				id.push(n.id);
+			});
+			data.ids = id.join();
 		}
 	};
 

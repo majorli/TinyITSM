@@ -282,8 +282,10 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 	}
 	
 	private void merge(String key, Object value) {
-		if (null != value) {
-			// 传入了null，只有可能是purchaseTime或者expiredTime两个时间值，均表示没有这个属性的值，那么也不用管它
+		if (null == value) {
+			// 传入了null，只有可能是purchaseTime或者expiredTime两个时间值，均表示没有这个属性的值，直接置入null即可
+			props.put(key, value);
+		} else {
 			if (props.containsKey(key)) {
 				// 当前props里有这个key
 				Object oldValue = props.get(key);
