@@ -210,6 +210,19 @@ $(function() {
 				"pagination" : true,
 				"pageSize" : 20
 			});
+			$("#aProps").dialog({
+				"buttons" : [ {
+					"text" : "确定",
+					"iconCls" : "icon-saved",
+					"handler" : grid.sendProps
+				}, {
+					"text" : "取消",
+					"iconCls" : "icon-multiple",
+					"handler" : function() {
+						$("#aProps").dialog("close");
+					}
+				} ]
+			});
 		},
 		"loadHardware" : function() {
 			var c = $("#hwCatalog").combobox("getValue");
@@ -253,6 +266,69 @@ $(function() {
 					$("#software").datagrid("load", params);
 				}
 			}
+		},
+		"openProps" : function() {
+			var data = {
+				"ids" : "",
+				"type" : 0
+			};
+			var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
+			var sel = [];
+			if (tab == 0) {
+				data.type = 1;
+				sel = $("#hardware").datagrid("getSelections");
+				$("#aProps div.SW").hide();
+				$("#aProps div.HW").show();
+			} else if (tab == 1) {
+				data.type = 3;
+				sel = $("#software").datagrid("getSelections");
+				$("#aProps div.SW").show();
+				$("#aProps div.HW").hide();
+			} else {
+				return;
+			}
+			if (sel.length == 0) {
+				return;
+			}
+			var id = [];
+			$.each(sel, function(i, n) {
+				id.push(n.id);
+			});
+			data.ids = id.join();
+			$("#aProps").dialog({
+				"title" : "资产属性[已选" + id.length + "项资产]"
+			});
+			// $.ajax({
+			//				
+			// });
+			$("#aProps").dialog("open");
+		},
+		"sendProps" : function() {
+			alert("sending...");
+//			var data = {
+//				"ids" : "",
+//				"type" : 0,
+//				"props" : {}
+//			};
+//			var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
+//			var sel = [];
+//			if (tab == 0) {
+//				data.type = 1;
+//				sel = $("#hardware").datagrid("getSelections");
+//			} else if (tab == 1) {
+//				data.type = 3;
+//				sel = $("#software").datagrid("getSelections");
+//			} else {
+//				return;
+//			}
+//			if (sel.length == 0) {
+//				return;
+//			}
+//			var id = [];
+//			$.each(sel, function(i, n) {
+//				id.push(n.id);
+//			});
+//			data.ids = id.join();
 		}
 	};
 
@@ -340,4 +416,5 @@ $(function() {
 		} ],
 		"onSelect" : grid.loadSoftware
 	});
+	$("#editProperties").on("click", grid.openProps);
 });

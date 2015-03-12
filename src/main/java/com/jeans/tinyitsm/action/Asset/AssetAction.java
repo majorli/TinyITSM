@@ -5,6 +5,9 @@ import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -218,5 +221,28 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 			});
 		}
 		return SUCCESS;
+	}
+
+	private Map<String, Object> props;
+
+	public Map<String, Object> getProps() {
+		return props;
+	}
+
+	public void setProps(Map<String, Object> props) {
+		this.props = props;
+	}
+
+	public String loadProps() throws Exception {
+		props = new HashMap<String, Object>();
+		List<Asset> assets = assetService.loadAssets(splitIds(), type);
+		for (Asset asset : assets) {
+			mergeProps(asset);
+		}
+		return SUCCESS;
+	}
+
+	private void mergeProps(Asset asset) {
+		// TODO 合并属性
 	}
 }

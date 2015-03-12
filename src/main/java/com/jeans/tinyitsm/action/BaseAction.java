@@ -87,8 +87,7 @@ public class BaseAction<T> extends TinyAction {
 			for (String id : stringIds) {
 				try {
 					idSet.add(Long.parseLong(id.trim()));
-				} catch (NumberFormatException e) {
-				}
+				} catch (NumberFormatException e) {}
 			}
 		}
 		return idSet;

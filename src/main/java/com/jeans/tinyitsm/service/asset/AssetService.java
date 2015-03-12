@@ -1,6 +1,8 @@
 package com.jeans.tinyitsm.service.asset;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.jeans.tinyitsm.model.asset.Asset;
 import com.jeans.tinyitsm.model.view.AssetItem;
@@ -18,6 +20,17 @@ public interface AssetService {
 	 * @return
 	 */
 	public Asset loadAsset(long id, byte type);
+
+	/**
+	 * 根据id集合和类型获取资产列表
+	 * 
+	 * @param ids
+	 *            资产id集合
+	 * @param type
+	 *            资产类型，硬件或软件
+	 * @return
+	 */
+	public List<Asset> loadAssets(Set<Long> ids, byte type);
 
 	/**
 	 * 分页获取资产

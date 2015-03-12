@@ -17,6 +17,10 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/jquery/themes/icon.css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/ext-icon.css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/itsm.css" />
+<style type="text/css">
+	div.TinyLine>span {display:inline-block;width:100px;}
+	div.TinyLine>input {width:480px;}
+</style>
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/js/ast_home.js"></script>
 <title>TinyAsset - 资产管理</title>
 </head>
@@ -45,8 +49,7 @@
 			</div>
 		</div>
 	</div>
-	<div id="aProps" class="easyui-dialog" data-options="closed:true,width:580,height:300,top:220,modal:true,title:'资产属性',iconCls:'icon-table-edit'" style="padding:1em; overflow:hidden">
-		<input type="hidden" id="v_ids" />
+	<div id="aProps" class="easyui-dialog" data-options="closed:true,width:650,height:380,top:220,modal:true,title:'资产属性',iconCls:'icon-table-edit'" style="padding:1em;">
 		<div id="p_code" class="TinyLine HW"><span>资产编号：</span><input id="v_code"  class="easyui-textbox" data-options="validType:'length[0,32]',height:24" /></div>
 		<div id="p_financialCode" class="TinyLine HW"><span>财务资产编号：</span><input id="v_financialCode"  class="easyui-textbox" data-options="validType:'length[0,32]',height:24" /></div>
 		<div id="p_name" class="TinyLine"><span>名称：</span><input id="v_name"  class="easyui-textbox" data-options="validType:'length[0,32]',height:24" /></div>
@@ -58,11 +61,11 @@
 		<div id="p_purchaseTime" class="TinyLine"><span>采购时间：</span><input id="v_purchaseTime" type="text" class="easyui-datebox" data-options="height:24" /></div>
 		<div id="p_quantity" class="TinyLine"><span>数量：</span><input id="v_quantity" class="easyui-numberspinner" data-options="min:1,height:24" /></div>
 		<div id="p_cost" class="TinyLine"><span>原值：</span><input id="v_cost" class="easyui-numberspinner" data-options="min:0,precision:2,groupSeparator:',',prefix:'￥',height:24" /></div>
-		<div id="p_warranty" class="TinyLine HW"><span>保修状态：</span><input id="v_warranty" class="easyui-combobox" data-options="valueField:'id',textField:'text',data:[{id:0,text:'在保'},{id:1,text:'续保'},{id:-1,text:'过保'}],value:0,height:24" /></div>
+		<div id="p_warranty" class="TinyLine HW"><span>保修状态：</span><input id="v_warranty" class="easyui-combobox" data-options="valueField:'id',textField:'text',data:[{id:0,text:'在保'},{id:1,text:'续保'},{id:-1,text:'过保'}],height:24" /></div>
 		<div id="p_location" class="TinyLine HW"><span>物理位置：</span><input id="v_location"  class="easyui-textbox" data-options="validType:'length[0,255]',height:24" /></div>
 		<div id="p_ip" class="TinyLine HW"><span>网络地址：</span><input id="v_ip" class="easyui-textbox" data-options="validType:'length[0,64]',height:24" /></div>
-		<div id="p_importance" class="TinyLine HW"><span>重要程度：</span><input id="v_importance" class="easyui-combobox" data-options="valueField:'id',textField:'text',data:[{id:0,text:'普通'},{id:1,text:'重要'},{id:2,text:'关键'}],value:0,height:24" /></div>
-		<div id="p_softwareType" class="TinyLine SW"><span>软件类型：</span><input id="v_softwareType" class="easyui-combobox" data-options="valueField:'id',textField:'text',data:[{id:0,text:'商品软件'},{id:1,text:'自由/开源软件'},{id:2,text:'免费软件'},{id:3,text:'试用软件'},{id:4,text:'定制开发软件'},{id:5,text:'自主研发软件'},{id:6,text:'其他类型软件'}],value:0,height:24" /></div>
+		<div id="p_importance" class="TinyLine HW"><span>重要程度：</span><input id="v_importance" class="easyui-combobox" data-options="valueField:'id',textField:'text',data:[{id:0,text:'普通'},{id:1,text:'重要'},{id:2,text:'关键'}],height:24" /></div>
+		<div id="p_softwareType" class="TinyLine SW"><span>软件类型：</span><input id="v_softwareType" class="easyui-combobox" data-options="valueField:'id',textField:'text',data:[{id:0,text:'商品软件'},{id:1,text:'自由/开源软件'},{id:2,text:'免费软件'},{id:3,text:'试用软件'},{id:4,text:'定制开发软件'},{id:5,text:'自主研发软件'},{id:6,text:'其他类型软件'}],height:24" /></div>
 		<div id="p_license" class="TinyLine SW"><span>许可证：</span><input id="v_license" class="easyui-textbox" data-options="validType:'length[0,64]',height:24" /></div>
 		<div id="p_expiredTime" class="TinyLine SW"><span>许可期限：</span><input id="v_expiredTime" type="text" class="easyui-datebox" data-options="height:24" /></div>
 		<div id="p_comment" class="TinyLine"><span>备注：</span><input id="v_comment" class="easyui-textbox" data-options="validType:'length[0,255]',height:24" /></div>

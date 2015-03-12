@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class AssetServiceImpl implements AssetService {
 	private BaseDao<Asset> asDao;
 	private BaseDao<Hardware> hwDao;
 	private BaseDao<Software> swDao;
-	
+
 	private HRService hrService;
 
 	@Autowired
@@ -74,10 +75,30 @@ public class AssetServiceImpl implements AssetService {
 
 	@Override
 	@Transactional(readOnly = true)
+	public List<Asset> loadAssets(Set<Long> ids, byte type) {
+		List<Asset> assets = new ArrayList<Asset>();
+		if (ids.size() == 1) {
+			assets.add(loadAsset(ids.iterator().next(), type));
+		} else if (ids.size() > 1) {
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("p_ids", ids);
+			if (type == AssetConstants.HARDWARE_ASSET) {
+				String hql = "from Hardware where id in (:p_ids)";
+				assets.addAll(hwDao.find(hql, params));
+			} else if (type == AssetConstants.SOFTWARE_ASSET) {
+				String hql = "from Software where id in (:p_ids)";
+				assets.addAll(swDao.find(hql, params));
+			}
+		}
+		return assets;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public Grid<AssetItem> loadAssets(long companyId, byte catalog, int page, int rows) {
 		Grid<AssetItem> assetItems = new Grid<AssetItem>();
 		List<AssetItem> assetItemsList = new ArrayList<AssetItem>();
-	
+
 		List<Asset> assets = new ArrayList<Asset>();
 		StringBuilder hql = new StringBuilder("from ");
 		Map<String, Object> params = new HashMap<String, Object>();
