@@ -233,6 +233,13 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 		this.props = props;
 	}
 
+	/**
+	 * 用于资产管理界面的属性编辑弹出窗口
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value = "load-props", results = { @Result(type = "json", params = { "root", "props" }) })
 	public String loadProps() throws Exception {
 		props = new HashMap<String, Object>();
 		List<Asset> assets = assetService.loadAssets(splitIds(), type);
@@ -242,7 +249,54 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 		return SUCCESS;
 	}
 
+	/**
+	 * 对于当前资产的某一个属性：<br>
+	 * 如果当前props中没有这个key，那么就用当前资产的属性置入<br>
+	 * 如果当前props中有这个key而且value==null或者value和当前资产的属性相等，那么不发生任何变化，如果不等就置为null<br>
+	 * 
+	 * @param asset
+	 */
 	private void mergeProps(Asset asset) {
-		// TODO 合并属性
+		merge("name", asset.getName());
+		merge("vendor", asset.getVendor());
+		merge("modelOrVersion", asset.getModelOrVersion());
+		merge("assetUsage", asset.getAssetUsage());
+		merge("purchaseTime", asset.getPurchaseTime());
+		merge("quantity", asset.getQuantity());
+		merge("cost", asset.getCost());
+		merge("comment", asset.getComment());
+		if (asset instanceof Hardware) {
+			merge("code", ((Hardware) asset).getCode());
+			merge("financialCode", ((Hardware) asset).getFinancialCode());
+			merge("sn", ((Hardware) asset).getSn());
+			merge("configuration", ((Hardware) asset).getConfiguration());
+			merge("warranty", ((Hardware) asset).getWarranty());
+			merge("location", ((Hardware) asset).getLocation());
+			merge("ip", ((Hardware) asset).getIp());
+			merge("importance", ((Hardware) asset).getImportance());
+		} else if (asset instanceof Software) {
+			merge("softwareType", ((Software) asset).getSoftwareType());
+			merge("license", ((Software) asset).getLicense());
+			merge("expiredTime", ((Software) asset).getExpiredTime());
+		}
+	}
+	
+	private void merge(String key, Object value) {
+		if (null != value) {
+			// 传入了null，只有可能是purchaseTime或者expiredTime两个时间值，均表示没有这个属性的值，那么也不用管它
+			if (props.containsKey(key)) {
+				// 当前props里有这个key
+				Object oldValue = props.get(key);
+				if (null != oldValue && !value.equals(oldValue)) {
+					// 原值不为null表示以前merge入的所有这个属性均为统一值
+					// 如果现在的value不统一了，那么就把原来的值设置为null，以表示多个值不统一了
+					props.put(key, null);
+				}
+				// 其他情况，即要么原值为null表示原来就已经不是统一值了，要么value和原来那个统一的值相等，都不需要对props做任何改变
+			} else {
+				// props里还没有这个key，直接置入即可
+				props.put(key, value);
+			}
+		}
 	}
 }
