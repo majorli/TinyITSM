@@ -57,4 +57,17 @@ public interface AssetService {
 	 * @return
 	 */
 	public Asset newAsset(Map<String, Object> properties, byte type);
+
+	/**
+	 * 更新资产的属性值（除companyId, ownerId, state外）
+	 * 
+	 * @param ids
+	 *            资产id集合
+	 * @param type
+	 *            资产类型
+	 * @param props
+	 *            新属性值Map
+	 * @return 实际更新数量
+	 */
+	public int saveProps(Set<Long> ids, byte type, Map<String, Object> props);
 }

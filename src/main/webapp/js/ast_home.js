@@ -307,8 +307,6 @@ $(function() {
 				"url" : "asset/load-props",
 				"data" : data,
 				"success" : function(props) {
-					// purchaseTime和expiredTime有可能没有，其他属性都必然会有定义，但有可能是null，所以先清空这两个datebox
-					$("#v_purchaseTime,#v_expiredTime").datebox("clear");
 					for ( var key in props) {
 						if (props[key] == null) {
 							if (key == "purchaseTime" || key == "expiredTime") {
@@ -338,11 +336,9 @@ $(function() {
 			});
 		},
 		"sendProps" : function() {
-			alert("sending...");
 			var data = {
 				"ids" : "",
-				"type" : 0,
-				"props" : {}
+				"type" : 0
 			};
 			var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
 			var sel = [];
@@ -363,6 +359,66 @@ $(function() {
 				id.push(n.id);
 			});
 			data.ids = id.join();
+			data["props.name"] = grid._getValue("name");
+			data["props.vendor"] = grid._getValue("vendor");
+			data["props.modelOrVersion"] = grid._getValue("modelOrVersion");
+			data["props.assetUsage"] = grid._getValue("assetUsage");
+			data["props.purchaseTime"] = grid._getValue("purchaseTime");
+			data["props.quantity"] = grid._getValue("quantity");
+			data["props.cost"] = grid._getValue("cost");
+			data["props.comment"] = grid._getValue("comment");
+			if (data.type == 1) {
+				data["props.code"] = grid._getValue("code");
+				data["props.financialCode"] = grid._getValue("financialCode");
+				data["props.sn"] = grid._getValue("sn");
+				data["props.configuration"] = grid._getValue("configuration");
+				data["props.warranty"] = grid._getValue("warranty");
+				data["props.location"] = grid._getValue("location");
+				data["props.ip"] = grid._getValue("ip");
+				data["props.importance"] = grid._getValue("importance");
+			} else {
+				data["props.softwareType"] = grid._getValue("softwareType");
+				data["props.license"] = grid._getValue("license");
+				data["props.expiredTime"] = grid._getValue("expiredTime");
+			}
+			$.ajax({
+				"url" : "asset/save-props",
+				"data" : data,
+				"success" : function(result) {
+					$.msgbox("消息", result + "项资产属性修改成功。", "info");
+					if (tab == 0) {
+						$("#hardware").datagrid("reload");
+					} else {
+						$("#software").datagrid("reload");
+					}
+					$("#aProps").dialog("close");
+				}
+			});
+		},
+		"_getValue" : function(key) {
+			var ele = "#v_" + key;
+			if (key == "purchaseTime" || key == "expiredTime") {
+				var dt = $(ele).datebox("getValue");
+				if (isNaN(Date.parse(dt))) {
+					return null;
+				} else {
+					return dt;
+				}
+			} else if (key == "warranty" || key == "importance" || key == "softwareType") {
+				if ($(ele).combobox("getValue") == null || $(ele).combobox("getText") == "") {
+					return -99;
+				} else {
+					return +$(ele).combobox("getValue");
+				}
+			} else if (key == "cost" || key == "quantity") {
+				if ($(ele).numberspinner("getValue")) {
+					return +$(ele).numberspinner("getValue")
+				} else {
+					return -1;
+				}
+			} else {
+				return $(ele).textbox("getValue");
+			}
 		}
 	};
 

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -184,5 +185,153 @@ public class AssetServiceImpl implements AssetService {
 			asDao.save(asset);
 		}
 		return asset;
+	}
+
+	@Override
+	@Transactional
+	public int saveProps(Set<Long> ids, byte type, Map<String, Object> props) {
+		if (ids.isEmpty()) {
+			return 0;
+		}
+		if (ids.size() == 1) {
+			Asset asset = loadAsset(ids.iterator().next(), type);
+			if (null == asset) {
+				return 0;
+			}
+			/*
+			 * 只编辑一项资产时：
+			 * 数值型属性为负数时保存该属性的最小值；
+			 * 日期型属性为null时保存为null；
+			 * 选择型属性为-99时保持原值不变；
+			 * 字符串属性直接保存。
+			 */
+			asset.setName((String) props.get("name"));
+			asset.setVendor((String) props.get("vendor"));
+			asset.setModelOrVersion((String) props.get("modelOrVersion"));
+			asset.setAssetUsage((String) props.get("assetUsage"));
+			asset.setPurchaseTime((Date) props.get("purchaseTime"));
+			int q = (int) props.get("quantity");
+			asset.setQuantity(q < 0 ? 1 : q);
+			BigDecimal c = (BigDecimal) props.get("cost");
+			asset.setCost(c.compareTo(BigDecimal.ZERO) == -1 ? BigDecimal.ZERO : c);
+			asset.setComment((String) props.get("comment"));
+			if (asset instanceof Hardware) {
+				((Hardware) asset).setCode((String) props.get("code"));
+				((Hardware) asset).setFinancialCode((String) props.get("financialCode"));
+				((Hardware) asset).setSn((String) props.get("sn"));
+				((Hardware) asset).setConfiguration((String) props.get("configuration"));
+				byte w = (byte) props.get("warranty");
+				if (w >= -1 && w <= 1) {
+					((Hardware) asset).setWarranty(w);
+				}
+				((Hardware) asset).setLocation((String) props.get("location"));
+				((Hardware) asset).setIp((String) props.get("ip"));
+				byte i = (byte) props.get("importance");
+				if (i >= 0 && i <= 2) {
+					((Hardware) asset).setImportance(i);
+				}
+				hwDao.update((Hardware) asset);
+				return 1;
+			} else if (asset instanceof Software) {
+				byte s = (byte) props.get("softwareType");
+				if (s >= 0 && s <= 6) {
+					((Software) asset).setSoftwareType(s);
+				}
+				((Software) asset).setLicense((String) props.get("license"));
+				((Software) asset).setExpiredTime((Date) props.get("expiredTime"));
+				swDao.update((Software) asset);
+				return 1;
+			} else {
+				return 0;
+			}
+		} else {
+			List<Asset> assets = loadAssets(ids, type);
+			int count = assets.size();
+			for (Asset asset : assets) {
+				/*
+				 * 编辑多项资产时：
+				 * 数值型属性为负数时保持各项资产该属性原值不变；
+				 * 日期型属性为null时保持各项资产该属性原值不变；
+				 * 选择型属性为-99时保持各项资产该属性原值不变；
+				 * 字符串属性为空串时保持各项资产该属性原值不变。
+				 */
+				String v = (String) props.get("name");
+				if (!StringUtils.isEmpty(v)) {
+					asset.setName(v);
+				}
+				v = (String) props.get("vendor");
+				if (!StringUtils.isEmpty(v)) {
+					asset.setVendor(v);
+				}
+				v = (String) props.get("modelOrVersion");
+				if (!StringUtils.isEmpty(v)) {
+					asset.setModelOrVersion(v);
+				}
+				v = (String) props.get("assetUsage");
+				if (!StringUtils.isEmpty(v)) {
+					asset.setAssetUsage(v);
+				}
+				Date d = (Date) props.get("purchaseTime");
+				if (null != d) {
+					asset.setPurchaseTime(d);
+				}
+				int q = (int) props.get("quantity");
+				if (q >= 0) {
+					asset.setQuantity(q);
+				}
+				BigDecimal c = (BigDecimal) props.get("cost");
+				if (c.compareTo(BigDecimal.ZERO) != -1) {
+					asset.setCost(c);
+				}
+				v = (String) props.get("comment");
+				if (!StringUtils.isEmpty(v)) {
+					asset.setComment(v);
+				}
+				if (asset instanceof Hardware) {
+					v = (String) props.get("sn");
+					if (!StringUtils.isEmpty(v)) {
+						((Hardware) asset).setSn(v);
+					}
+					v = (String) props.get("configuration");
+					if (!StringUtils.isEmpty(v)) {
+						((Hardware) asset).setConfiguration(v);
+					}
+					byte w = (byte) props.get("warranty");
+					if (w >= -1 && w <= 1) {
+						((Hardware) asset).setWarranty(w);
+					}
+					v = (String) props.get("location");
+					if (!StringUtils.isEmpty(v)) {
+						((Hardware) asset).setLocation(v);
+					}
+					v = (String) props.get("ip");
+					if (!StringUtils.isEmpty(v)) {
+						((Hardware) asset).setIp(v);
+					}
+					byte i = (byte) props.get("importance");
+					if (i >= 0 && i <= 2) {
+						((Hardware) asset).setImportance(i);
+					}
+					hwDao.update((Hardware) asset);
+				} else if (asset instanceof Software) {
+					byte s = (byte) props.get("softwareType");
+					if (s >= 0 && s <= 6) {
+						((Software) asset).setSoftwareType(s);
+					}
+					v = (String) props.get("license");
+					if (!StringUtils.isEmpty(v)) {
+						((Software) asset).setLicense(v);
+					}
+					d = (Date) props.get("expiredTime");
+					if (null != d) {
+						((Software) asset).setExpiredTime(d);
+					}
+					swDao.update((Software) asset);
+				} else {
+					count--;
+				}
+			}
+			return count;
+		}
 	}
 }

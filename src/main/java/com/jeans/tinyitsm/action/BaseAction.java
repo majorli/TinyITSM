@@ -79,7 +79,12 @@ public class BaseAction<T> extends TinyAction {
 	public void setData(T data) {
 		this.data = data;
 	}
-	
+
+	/**
+	 * 切分字符串ids为id集合
+	 * 
+	 * @return
+	 */
 	protected Set<Long> splitIds() {
 		Set<Long> idSet = new HashSet<Long>();
 		if (!StringUtils.isBlank(ids)) {

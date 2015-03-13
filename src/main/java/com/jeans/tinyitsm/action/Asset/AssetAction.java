@@ -1,13 +1,15 @@
-package com.jeans.tinyitsm.action.Asset;
+package com.jeans.tinyitsm.action.asset;
 
 import java.math.BigDecimal;
 import java.text.Collator;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -280,7 +282,7 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 			merge("expiredTime", ((Software) asset).getExpiredTime());
 		}
 	}
-	
+
 	private void merge(String key, Object value) {
 		if (null == value) {
 			// 传入了null，只有可能是purchaseTime或者expiredTime两个时间值，均表示没有这个属性的值，直接置入null即可
@@ -300,5 +302,67 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 				props.put(key, value);
 			}
 		}
+	}
+
+	private int result;
+
+	public int getResult() {
+		return result;
+	}
+
+	public void setResult(int result) {
+		this.result = result;
+	}
+
+	/**
+	 * 保存一到多个资产的属性编辑结果，数值型属性可能传入负数，日期型属性可能传入空串，选择型属性可能传入-99，字符串属性可能传入空串<br>
+	 * 所有类型的属性传入到Map中全部是String类型，需要自己做类型转换，由于前端使用了严格的验证所以类型转换可以不考虑异常情况<br>
+	 * <br>
+	 * 当只编辑一项资产时：
+	 * <li>数值型属性为负数时保存该属性的最小值；
+	 * <li>日期型属性为空串时保存为null；
+	 * <li>选择型属性为-99时保持原值不变；
+	 * <li>字符串属性直接保存。<br>
+	 * 当编辑多项资产时：<br>
+	 * <li>数值型属性为负数时保持各项资产该属性原值不变；
+	 * <li>日期型属性为空串时保持各项资产该属性原值不变；
+	 * <li>选择型属性为-99时保持各项资产该属性原值不变；
+	 * <li>字符串属性为空串时保持各项资产该属性原值不变。
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value = "save-props", results = { @Result(type = "json", params = { "root", "result" }) })
+	public String saveProps() throws Exception {
+		result = assetService.saveProps(splitIds(), type, transProps());
+		return SUCCESS;
+	}
+
+	/**
+	 * 转换前端传来的属性值Map对象，前端传来的所有属性值都是String[]类型，数组里应该有一个元素且不会等于null<br>
+	 * 如果发生数据错误，直接抛出异常给action方法，再由action方法抛出给容器<br>
+	 * 如果转换成功，只有时间类型的属性才有可能是null
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	private Map<String, Object> transProps() throws Exception {
+		Map<String, Object> p = new HashMap<String, Object>();
+		Set<String> keys = props.keySet();
+		for (String key : keys) {
+			String value = ((String[]) props.get(key))[0];
+			if ("expiredTime".equals(key) || "purchaseTime".equals(key)) {
+				p.put(key, "".equals(value) ? null : (new SimpleDateFormat("yyyy-MM-dd")).parse(value));
+			} else if ("quantity".equals(key)) {
+				p.put(key, Integer.parseInt(value));
+			} else if ("cost".equals(key)) {
+				p.put(key, BigDecimal.valueOf(Double.parseDouble(value)));
+			} else if ("warranty".equals(key) || "importance".equals(key) || "softwareType".equals(key)) {
+				p.put(key, Byte.parseByte(value));
+			} else {
+				p.put(key, value);
+			}
+		}
+		return p;
 	}
 }

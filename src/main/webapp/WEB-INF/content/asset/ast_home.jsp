@@ -50,7 +50,7 @@
 		</div>
 	</div>
 	<div id="aProps" class="easyui-dialog" data-options="closed:true,width:650,height:380,top:220,modal:true,title:'资产属性',iconCls:'icon-table-edit'" style="padding:1em;">
-		<h5 style="color:red">注意：多项资产同时编辑时，各项不统一的属性不显示初值，提交空值则保持各自原属性值不变。</h5>
+		<h5 style="color:red">提示：编辑多项资产时，不统一的属性不显示原值，提交空值保持原值不变，提交空格清除原值。</h5>
 		<div id="p_code" class="TinyLine HW"><span>资产编号：</span><input id="v_code"  class="easyui-textbox" data-options="validType:'length[0,32]',height:24" /></div>
 		<div id="p_financialCode" class="TinyLine HW"><span>财务资产编号：</span><input id="v_financialCode"  class="easyui-textbox" data-options="validType:'length[0,32]',height:24" /></div>
 		<div id="p_name" class="TinyLine"><span>名称：</span><input id="v_name"  class="easyui-textbox" data-options="validType:'length[0,32]',height:24" /></div>
