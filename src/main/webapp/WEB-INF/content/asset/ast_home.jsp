@@ -33,11 +33,16 @@
 				<div data-options="region:'north',title:'信息化资产管理',height:64,collapsible:false" style="padding:6px;overflow:hidden;">
 					<span style="vertical-align:-2px;">硬件类别：</span><select id="hwCatalog" class="easyui-combobox" data-options="editable:false,width:120"></select>
 					<span style="padding-left:2px;vertical-align:-2px;">软件类别：</span><select id="swCatalog" class="easyui-combobox" data-options="editable:false,width:120"></select>
-					<a id="showDetail" class="easyui-linkbutton" data-options="iconCls:'icon-table',plain:true">查看详情</a>
-					<a id="editProperties" class="easyui-linkbutton" data-options="iconCls:'icon-table-edit',plain:true">编辑属性</a>
-					<a id="appendAsset" class="easyui-linkbutton" data-options="iconCls:'icon-vcard-add',plain:true">新增资产</a>
-					<a id="changeState" class="easyui-linkbutton" data-options="iconCls:'icon-vcard-edit',plain:true">设备状态</a>
+					<a id="exportAssets" class="easyui-menubutton" data-options="iconCls:'icon-table',menu:'#exportMenu'">导出Excel</a>
 					<a id="editProperties" class="easyui-linkbutton" data-options="iconCls:'icon-table-lightning',plain:true">数据校验</a>
+					<a id="editProperties" class="easyui-linkbutton" data-options="iconCls:'icon-table-edit',plain:true">编辑属性</a>
+					<a id="changeState" class="easyui-linkbutton" data-options="iconCls:'icon-vcard-edit',plain:true">调整状态</a>
+					<a id="appendAsset" class="easyui-linkbutton" data-options="iconCls:'icon-vcard-add',plain:true">新增资产</a>
+				</div>
+				<div id="exportMenu">
+					<div id="_all">导出全部IT资产</div>
+					<div id="_hard">导出硬件类资产</div>
+					<div id="_soft">导出软件类资产</div>
 				</div>
 				<div data-options="region:'center'">
 					<div id="tabs" class="easyui-tabs" data-options="fit:true,border:false">
@@ -71,6 +76,8 @@
 		<div id="p_expiredTime" class="TinyLine SW"><span>许可期限：</span><input id="v_expiredTime" type="text" class="easyui-datebox" data-options="height:24" /></div>
 		<div id="p_comment" class="TinyLine"><span>备注：</span><input id="v_comment" class="easyui-textbox" data-options="validType:'length[0,255]',height:24" /></div>
 	</div>
+	<iframe name="dlerr" style="display:none"></iframe>
+	<form id="exportForm" action="asset/export-assets" method="post" target="dlerr"><input type="hidden" id="exportType" name="type"/></form>
 	<%@ include file="../html/footer.jsp"%>
 </body>
 </html>

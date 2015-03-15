@@ -419,6 +419,11 @@ $(function() {
 			} else {
 				return $(ele).textbox("getValue");
 			}
+		},
+		"exp" : function(type) {
+			// 导出资产为excel
+			$("#exportType").val(type);
+			$("#exportForm").form("submit");
 		}
 	};
 
@@ -507,4 +512,9 @@ $(function() {
 		"onSelect" : grid.loadSoftware
 	});
 	$("#editProperties").on("click", grid.openProps);
+	$($("#exportAssets").menubutton("options").menu).menu({
+		"onClick" : function(item) {
+			grid.exp(item.id);
+		}
+	});
 });

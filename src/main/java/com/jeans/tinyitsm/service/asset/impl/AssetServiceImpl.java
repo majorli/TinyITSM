@@ -145,6 +145,46 @@ public class AssetServiceImpl implements AssetService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public List<AssetItem> loadAssets(long companyId, byte catalog) {
+		List<AssetItem> assetItemsList = new ArrayList<AssetItem>();
+
+		List<Asset> assets = new ArrayList<Asset>();
+		StringBuilder hql = new StringBuilder("from ");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("p_companyId", companyId);
+		boolean isHardware = true;
+		if (catalog == AssetConstants.HARDWARE_ASSET) {
+			hql.append("Hardware where type = 1 ");
+		} else if (catalog == AssetConstants.SOFTWARE_ASSET) {
+			hql.append("Software where type = 3 ");
+			isHardware = false;
+		} else if (catalog >= AssetConstants.NETWORK_EQUIPMENT && catalog <= AssetConstants.OTHER_EQUIPMENT) {
+			hql.append("Hardware where catalog = :p_catalog ");
+			params.put("p_catalog", catalog);
+		} else if (catalog >= AssetConstants.OPERATING_SYSTEM_SOFTWARE && catalog <= AssetConstants.OTHER_SOFTWARE) {
+			hql.append("Software where catalog = :p_catalog ");
+			params.put("p_catalog", catalog);
+			isHardware = false;
+		}
+		hql.append("and companyId = :p_companyId order by catalog, id");
+		if (isHardware) {
+			assets.addAll(hwDao.find(hql.toString(), params));
+		} else {
+			assets.addAll(swDao.find(hql.toString(), params));
+		}
+		for (Asset asset : assets) {
+			if (asset instanceof Hardware) {
+				assetItemsList.add(HardwareItem.createInstance((Hardware) asset, hrService.getUnit(asset.getCompanyId(), HRConstants.COMPANY),
+						hrService.getUnit(((Hardware) asset).getOwnerId(), HRConstants.EMPLOYEE)));
+			} else if (asset instanceof Software) {
+				assetItemsList.add(SoftwareItem.createInstance((Software) asset, hrService.getUnit(asset.getCompanyId(), HRConstants.COMPANY)));
+			}
+		}
+		return assetItemsList;
+	}
+	
+	@Override
 	@Transactional
 	public Asset newAsset(Map<String, Object> properties, byte type) {
 		Asset asset = Asset.createAsset(type);

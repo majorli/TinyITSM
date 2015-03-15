@@ -48,6 +48,17 @@ public interface AssetService {
 	public Grid<AssetItem> loadAssets(long companyId, byte catalog, int page, int rows);
 
 	/**
+	 * 获取所有指定类型的资产
+	 * 
+	 * @param companyId
+	 *            公司id
+	 * @param catalog
+	 *            资产类型或分类
+	 * @return
+	 */
+	public List<AssetItem> loadAssets(long companyId, byte catalog);
+
+	/**
 	 * 新增资产，资产类型包括硬件、软件和其他，由AssetConstants中的三个常量定义
 	 * 
 	 * @param properties
