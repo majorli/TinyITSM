@@ -456,4 +456,10 @@ public class HRServiceImpl implements HRService {
 	public HRUnit appendDept(String name, String alias, long superId, short listOrder) {
 		return createDept(name, alias, superId, listOrder);
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Employee getEmployee(long id) {
+		return emplDao.getById(Employee.class, id);
+	}
 }

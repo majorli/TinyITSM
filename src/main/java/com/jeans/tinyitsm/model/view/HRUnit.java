@@ -21,8 +21,7 @@ public class HRUnit implements Serializable, TreeNode {
 
 	private static final String[] iconClsNames = { "icon-company", "icon-department", "icon-employee" };
 
-	public HRUnit() {
-	}
+	public HRUnit() {}
 
 	public HRUnit(long id, String name, String alias, byte type, short listOrder, List<HRUnit> children) {
 		super();

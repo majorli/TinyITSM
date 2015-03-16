@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +18,9 @@ import com.jeans.tinyitsm.dao.BaseDao;
 import com.jeans.tinyitsm.model.asset.Asset;
 import com.jeans.tinyitsm.model.asset.Hardware;
 import com.jeans.tinyitsm.model.asset.Software;
+import com.jeans.tinyitsm.model.hr.Employee;
 import com.jeans.tinyitsm.model.view.AssetItem;
+import com.jeans.tinyitsm.model.view.AssetValidateResult;
 import com.jeans.tinyitsm.model.view.Grid;
 import com.jeans.tinyitsm.model.view.HardwareItem;
 import com.jeans.tinyitsm.model.view.SoftwareItem;
@@ -183,7 +186,7 @@ public class AssetServiceImpl implements AssetService {
 		}
 		return assetItemsList;
 	}
-	
+
 	@Override
 	@Transactional
 	public Asset newAsset(Map<String, Object> properties, byte type) {
@@ -373,5 +376,157 @@ public class AssetServiceImpl implements AssetService {
 			}
 			return count;
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<AssetValidateResult> validate(long companyId) {
+		List<AssetValidateResult> results = new ArrayList<AssetValidateResult>();
+
+		String hql = "from Hardware where companyId = " + companyId;
+		List<Hardware> assets = hwDao.find(hql);
+		for (Hardware hardware : assets) {
+			if (hardware.getOwnerId() == 0) {
+				// 无责任人
+				if (hardware.getState() == AssetConstants.IN_USE) {
+					// 在用设备无责任人
+					results.add(new AssetValidateResult(AssetConstants.IN_USE_ASSET_WITHOUT_OWNER, hardware.getId(), AssetConstants
+							.getAssetCatalogName(hardware.getCatalog()), hardware.getFullName(), null, null));
+				}
+			} else {
+				// 有责任人
+				Employee owner = hrService.getEmployee(hardware.getOwnerId());
+				if (null == owner) {
+					// 责任人不存在
+					results.add(new AssetValidateResult(AssetConstants.INVALID_OWNER, hardware.getId(), AssetConstants.getAssetCatalogName(hardware
+							.getCatalog()), hardware.getFullName(), null, null));
+				} else {
+					if (owner.getDepartment().getSubRoot().getId() != hardware.getCompanyId()) {
+						// 责任人和资产所属公司不一致
+						results.add(new AssetValidateResult(AssetConstants.INVALID_OWNER_COMPANY, hardware.getId(), AssetConstants.getAssetCatalogName(hardware
+								.getCatalog()), hardware.getFullName(), owner.getName(), owner.getDepartment().getSubRoot().getAlias()));
+					} else {
+						if (owner.getState() == HRConstants.FORMER && hardware.getState() == AssetConstants.IN_USE) {
+							// 在用设备的责任人已经离职
+							results.add(new AssetValidateResult(AssetConstants.IN_USE_ASSET_OWNED_BY_FORMER_EMPLOYEE, hardware.getId(), AssetConstants
+									.getAssetCatalogName(hardware.getCatalog()), hardware.getFullName(), owner.getName(), owner.getDepartment().getSubRoot()
+									.getAlias()));
+						}
+					}
+				}
+			}
+		}
+		return results;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Set<Byte> checkNextStates(Set<Long> ids, byte type) {
+		Set<Byte> states = new HashSet<Byte>();
+		if (ids.size() == 0) {
+			return states;
+		}
+
+		states.add(AssetConstants.IN_USE);
+		states.add(AssetConstants.IDLE);
+		states.add(AssetConstants.DISUSE);
+		if (type == AssetConstants.HARDWARE_ASSET) {
+			states.add(AssetConstants.FIXING);
+			states.add(AssetConstants.ELIMINATED);
+		}
+
+		// 状态转移表
+		Set<Byte> n_h_iu = new HashSet<Byte>();
+		Set<Byte> n_h_id = new HashSet<Byte>();
+		Set<Byte> n_h_fx = new HashSet<Byte>();
+		Set<Byte> n_h_du = new HashSet<Byte>();
+		Set<Byte> n_s_iu = new HashSet<Byte>();
+		Set<Byte> n_s_id = new HashSet<Byte>();
+
+		n_h_iu.add(AssetConstants.IN_USE);
+		n_h_iu.add(AssetConstants.IDLE);
+		n_h_iu.add(AssetConstants.FIXING);
+
+		n_h_id.add(AssetConstants.IN_USE);
+		n_h_id.add(AssetConstants.FIXING);
+		n_h_id.add(AssetConstants.DISUSE);
+
+		n_h_fx.add(AssetConstants.IN_USE);
+		n_h_fx.add(AssetConstants.IDLE);
+		n_h_fx.add(AssetConstants.DISUSE);
+
+		n_h_du.add(AssetConstants.ELIMINATED);
+
+		n_s_iu.add(AssetConstants.IDLE);
+		n_s_iu.add(AssetConstants.DISUSE);
+
+		n_s_id.add(AssetConstants.IN_USE);
+		n_s_id.add(AssetConstants.DISUSE);
+
+		List<Asset> assets = loadAssets(ids, type);
+		if (type == AssetConstants.HARDWARE_ASSET) {
+			/*
+			 * 硬件类资产(状态变为在用时需要选择责任人)：
+			 * 在用 -> 在用/备用/维修
+			 * 备用 -> 在用/维修/淘汰
+			 * 维修 -> 在用/备用/淘汰（转移为在用时默认选中原责任人，如果有的话）
+			 * 淘汰 -> 报损
+			 * 报损 -> null
+			 */
+			for (Asset asset : assets) {
+				byte oldState = asset.getState();
+				if (oldState == AssetConstants.ELIMINATED) {
+					// 剪枝：无论什么时候遇到原状态为报损的，直接将结果集清空并跳出循环
+					states.clear();
+					break;
+				} else {
+					if (states.size() == 0) {
+						// 剪枝：已经没有下一种可能状态了，直接跳出循环
+						break;
+					} else {
+						switch (oldState) {
+						case AssetConstants.IN_USE:
+							states.retainAll(n_h_iu);
+							break;
+						case AssetConstants.IDLE:
+							states.retainAll(n_h_id);
+							break;
+						case AssetConstants.FIXING:
+							states.retainAll(n_h_fx);
+							break;
+						case AssetConstants.DISUSE:
+							states.retainAll(n_h_du);
+						}
+					}
+				}
+			}
+		} else {
+			/*
+			 * 软件类资产：
+			 * 在用 -> 备用/淘汰
+			 * 备用 -> 在用/淘汰
+			 * 淘汰 -> null
+			 */
+			for (Asset asset : assets) {
+				byte oldState = asset.getState();
+				if (oldState == AssetConstants.DISUSE) {
+					// 剪枝：无论什么时候遇到原状态为淘汰的，直接将结果集清空并跳出循环
+					states.clear();
+					break;
+				} else {
+					if (states.size() == 1) {
+						// 剪枝：已经只剩下淘汰一种可能了，后续的资产如果不是出现原状态为淘汰的就不会再对结果有任何影响了，所以无需再做交集，直接跳到下一项资产
+						continue;
+					} else {
+						if (oldState == AssetConstants.IN_USE) {
+							states.retainAll(n_s_iu);
+						} else {
+							states.retainAll(n_s_id);
+						}
+					}
+				}
+			}
+		}
+		return states;
 	}
 }

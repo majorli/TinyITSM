@@ -20,6 +20,7 @@
 <style type="text/css">
 	div.TinyLine>span {display:inline-block;width:100px;}
 	div.TinyLine>input {width:480px;}
+	div#validation li span {color:red;}
 </style>
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/js/ast_home.js"></script>
 <title>TinyAsset - 资产管理</title>
@@ -34,7 +35,7 @@
 					<span style="vertical-align:-2px;">硬件类别：</span><select id="hwCatalog" class="easyui-combobox" data-options="editable:false,width:120"></select>
 					<span style="padding-left:2px;vertical-align:-2px;">软件类别：</span><select id="swCatalog" class="easyui-combobox" data-options="editable:false,width:120"></select>
 					<a id="exportAssets" class="easyui-menubutton" data-options="iconCls:'icon-table',menu:'#exportMenu'">导出Excel</a>
-					<a id="editProperties" class="easyui-linkbutton" data-options="iconCls:'icon-table-lightning',plain:true">数据校验</a>
+					<a id="validateAssets" class="easyui-linkbutton" data-options="iconCls:'icon-table-lightning',plain:true">数据校验</a>
 					<a id="editProperties" class="easyui-linkbutton" data-options="iconCls:'icon-table-edit',plain:true">编辑属性</a>
 					<a id="changeState" class="easyui-linkbutton" data-options="iconCls:'icon-vcard-edit',plain:true">调整状态</a>
 					<a id="appendAsset" class="easyui-linkbutton" data-options="iconCls:'icon-vcard-add',plain:true">新增资产</a>
@@ -48,7 +49,7 @@
 					<div id="tabs" class="easyui-tabs" data-options="fit:true,border:false">
 						<div title="硬件类资产" style="padding-top:1px"><table id="hardware"></table></div>
 						<div title="软件类资产" style="padding:1px"><table id="software"></table></div>
-						<div title="资产校验表" style="padding:1px"></div>
+						<div title="资产校验表" style="padding:1px"><div id="validation" style="padding:.5em;"></div></div>
 					</div>
 				</div>
 			</div>

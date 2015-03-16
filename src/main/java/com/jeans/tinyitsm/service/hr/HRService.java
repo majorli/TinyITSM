@@ -2,6 +2,7 @@ package com.jeans.tinyitsm.service.hr;
 
 import java.util.List;
 
+import com.jeans.tinyitsm.model.hr.Employee;
 import com.jeans.tinyitsm.model.view.HRUnit;
 
 /**
@@ -172,4 +173,12 @@ public interface HRService {
 	 * @return
 	 */
 	public HRUnit appendDept(String name, String alias, long superId, short listOrder);
+
+	/**
+	 * 获取指定员工的实际对象
+	 * 
+	 * @param id 员工id
+	 * @return
+	 */
+	public Employee getEmployee(long id);
 }

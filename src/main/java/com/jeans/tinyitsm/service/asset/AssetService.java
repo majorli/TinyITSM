@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.jeans.tinyitsm.model.asset.Asset;
 import com.jeans.tinyitsm.model.view.AssetItem;
+import com.jeans.tinyitsm.model.view.AssetValidateResult;
 import com.jeans.tinyitsm.model.view.Grid;
 
 public interface AssetService {
@@ -81,4 +82,24 @@ public interface AssetService {
 	 * @return 实际更新数量
 	 */
 	public int saveProps(Set<Long> ids, byte type, Map<String, Object> props);
+
+	/**
+	 * 检查指定公司下的硬件类资产数据一致性
+	 * 
+	 * @param companyId
+	 *            公司id
+	 * @return
+	 */
+	public List<AssetValidateResult> validate(long companyId);
+
+	/**
+	 * 检查指定资产可以转移为的下一个状态，多项资产一起检查时取各项交集，可能为空
+	 * 
+	 * @param ids
+	 *            资产id集合
+	 * @param type
+	 *            资产类型
+	 * @return
+	 */
+	public Set<Byte> checkNextStates(Set<Long> ids, byte type);
 }

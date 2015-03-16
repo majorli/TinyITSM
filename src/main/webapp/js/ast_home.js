@@ -5,6 +5,8 @@ $(function() {
 	$("#breadcrumbs").html("<a href=\"javascript:window.location.replace('func?code=HOME_PAGE')\">首页</a>&nbsp;&#187;&nbsp;资产管理");
 	var grid = {
 		"init" : function() {
+			$("div#validation").delegate("a._Chown", "click", grid._chown);
+			$("div#validation").delegate("a._SetIdle", "click", grid._setIdle);
 			$("#hardware").datagrid({
 				"fit" : true,
 				"rownumbers" : true,
@@ -424,6 +426,66 @@ $(function() {
 			// 导出资产为excel
 			$("#exportType").val(type);
 			$("#exportForm").form("submit");
+		},
+		"validate" : function() {
+			$("#tabs").tabs("select", 2);
+			var v = $("<ol id='vali'></ol>");
+			$.waitbox("正在校验");
+			$.ajax({
+				"url" : "asset/asset-vali",
+				"success" : function(validation) {
+					var count = 0;
+					for ( var id in validation) {
+						var l = $(validation[id]);
+						l.prop("id", id);
+						v.append(l);
+						count++;
+					}
+					$("#validation").html("").append("<h4>资产数据校验：共发现" + count + "项资产数据可能存在错误：</h4>").append(v);
+					$.waitbox();
+				}
+			});
+		},
+		"_chown" : function() {
+			// TODO 设置责任人
+			alert("chown " + $(this).parent().prop("id"));
+		},
+		"_setIdle" : function() {
+			// TODO 回收设备（状态设置为IDLE，责任人id设置为0）
+			alert("setIdle " + $(this).parent().prop("id"));
+		},
+		"beginChangeState" : function() {
+			var data = {
+					"ids" : "",
+					"type" : 0
+				};
+				var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
+				var sel = [];
+				if (tab == 0) {
+					data.type = 1;
+					sel = $("#hardware").datagrid("getSelections");
+				} else if (tab == 1) {
+					data.type = 3;
+					sel = $("#software").datagrid("getSelections");
+				} else {
+					return;
+				}
+				if (sel.length == 0) {
+					return;
+				}
+				var id = [];
+				$.each(sel, function(i, n) {
+					id.push(n.id);
+				});
+				data.ids = id.join();
+				$.ajax({
+					"url" : "asset/check-state",
+					"data" : data,
+					"success" : function(nextStates) {
+						console.info(nextStates);
+						// TODO 生成状态转移对话框
+					}
+				});
 		}
 	};
 
@@ -517,4 +579,6 @@ $(function() {
 			grid.exp(item.id);
 		}
 	});
+	$("#validateAssets").on("click", grid.validate);
+	$("#changeState").on("click", grid.beginChangeState);
 });
