@@ -456,36 +456,46 @@ $(function() {
 		},
 		"beginChangeState" : function() {
 			var data = {
-					"ids" : "",
-					"type" : 0
-				};
-				var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
-				var sel = [];
-				if (tab == 0) {
-					data.type = 1;
-					sel = $("#hardware").datagrid("getSelections");
-				} else if (tab == 1) {
-					data.type = 3;
-					sel = $("#software").datagrid("getSelections");
-				} else {
-					return;
-				}
-				if (sel.length == 0) {
-					return;
-				}
-				var id = [];
-				$.each(sel, function(i, n) {
-					id.push(n.id);
-				});
-				data.ids = id.join();
-				$.ajax({
-					"url" : "asset/check-state",
-					"data" : data,
-					"success" : function(nextStates) {
-						console.info(nextStates);
+				"ids" : "",
+				"type" : 0
+			};
+			var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
+			var sel = [];
+			if (tab == 0) {
+				data.type = 1;
+				sel = $("#hardware").datagrid("getSelections");
+			} else if (tab == 1) {
+				data.type = 3;
+				sel = $("#software").datagrid("getSelections");
+			} else {
+				return;
+			}
+			if (sel.length == 0) {
+				return;
+			}
+			var id = [];
+			$.each(sel, function(i, n) {
+				id.push(n.id);
+			});
+			data.ids = id.join();
+			$.ajax({
+				"url" : "asset/check-state",
+				"data" : data,
+				"success" : function(nextStates) {
+					if (nextStates.length == 0) {
+						$.msgbox("错误", "所选的资产没有统一的状态变更方式。", "warning");
+					} else {
 						// TODO 生成状态转移对话框
+						var st = [];
+						$.each(nextStates, function(i, n) {
+
+						});
+
+						// 打开对话框
+						$("#aState").dialog("open");
 					}
-				});
+				}
+			});
 		}
 	};
 
@@ -581,4 +591,11 @@ $(function() {
 	});
 	$("#validateAssets").on("click", grid.validate);
 	$("#changeState").on("click", grid.beginChangeState);
+	$("#v_dept").combotree({
+		"onChange" : function(newValue, oldValue) {
+			$("#v_empl").combobox({
+				"url" : "hr/get-children?type=1&id=" + newValue,
+			});
+		}
+	});
 });

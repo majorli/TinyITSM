@@ -18,9 +18,11 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/ext-icon.css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/itsm.css" />
 <style type="text/css">
-	div.TinyLine>span {display:inline-block;width:100px;}
-	div.TinyLine>input {width:480px;}
+	div#aProp div.TinyLine>span {display:inline-block;width:100px;}
+	div#aProp div.TinyLine>input {width:480px;}
 	div#validation li span {color:red;}
+	div#aState div.TinyLine>span {display:inline-block;width:80px;}
+	#v_state,#v_dept,#v_empl {width:270px;}
 </style>
 <script type="text/javascript" charset="UTF-8" src="${pageContext.request.contextPath}/js/ast_home.js"></script>
 <title>TinyAsset - 资产管理</title>
@@ -76,6 +78,13 @@
 		<div id="p_license" class="TinyLine SW"><span>许可证：</span><input id="v_license" class="easyui-textbox" data-options="validType:'length[0,64]',height:24" /></div>
 		<div id="p_expiredTime" class="TinyLine SW"><span>许可期限：</span><input id="v_expiredTime" type="text" class="easyui-datebox" data-options="height:24" /></div>
 		<div id="p_comment" class="TinyLine"><span>备注：</span><input id="v_comment" class="easyui-textbox" data-options="validType:'length[0,255]',height:24" /></div>
+	</div>
+	<div id="aState" class="easyui-dialog" data-options="closed:true,width:400,height:250,top:220,modal:true,title:'资产状态',iconCls:'icon-vcard-edit'" style="padding:1em;">
+		<h5>根据所选资产原有状态，可以进行以下状态变更。</h5>
+		<div id="p_state" class="TinyLine"><span>新资产状态：</span><input id="v_state" class="easyui-combobox" data-options="editable:false,valueField:'id',textField:'text'" /></div>
+		<div id="p_dept" class="TinyLine"><span>责任部门：</span><input id="v_dept" class="easyui-combotree" data-options="editable:false,valueField:'id',textField:'text',url:'hr/get-curr-depts'" /></div>
+		<div id="p_empl" class="TinyLine"><span>责任人：</span><input id="v_empl" class="easyui-combobox" data-options="editable:false,valueField:'id',textField:'name'" /></div>
+		<div id="p_keep" class="TinyLine"><label><input type="checkbox" id="v_keep" style="margin-right:.5em;" />其中原先具有责任人的资产保持其原有责任人不变</label></div>
 	</div>
 	<iframe name="dlerr" style="display:none"></iframe>
 	<form id="exportForm" action="asset/export-assets" method="post" target="dlerr"><input type="hidden" id="exportType" name="type"/></form>
