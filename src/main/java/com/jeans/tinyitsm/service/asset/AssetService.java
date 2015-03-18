@@ -102,4 +102,21 @@ public interface AssetService {
 	 * @return
 	 */
 	public Set<Byte> checkNextStates(Set<Long> ids, byte type);
+
+	/**
+	 * 批量调整资产的使用状态
+	 * 
+	 * @param ids
+	 *            资产id集合
+	 * @param type
+	 *            资产类型，硬件/软件
+	 * @param newState
+	 *            新的使用状态
+	 * @param ownerId
+	 *            责任人id（仅硬件类资产）
+	 * @param keepOldOwner
+	 *            是否保留原有的责任人（多个硬件类资产批量调整时）
+	 * @return
+	 */
+	public int changeState(Set<Long> ids, byte type, byte newState, long ownerId, boolean keepOldOwner);
 }

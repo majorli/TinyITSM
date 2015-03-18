@@ -18,8 +18,8 @@
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/ext-icon.css" />
 <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/itsm.css" />
 <style type="text/css">
-	div#aProp div.TinyLine>span {display:inline-block;width:100px;}
-	div#aProp div.TinyLine>input {width:480px;}
+	div#aProps div.TinyLine>span {display:inline-block;width:100px;}
+	div#aProps div.TinyLine>input {width:480px;}
 	div#validation li span {color:red;}
 	div#aState div.TinyLine>span {display:inline-block;width:80px;}
 	#v_state,#v_dept,#v_empl {width:270px;}

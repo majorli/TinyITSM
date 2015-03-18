@@ -529,4 +529,38 @@ public class AssetServiceImpl implements AssetService {
 		}
 		return states;
 	}
+
+	/**
+	 * 硬件类资产如果新状态为0(IN_USE)，则需要同时设置ownerId，如果keepOldOwner == true则原来ownerId != 0的保持不变<br>
+	 * 硬件类资产如果新状态不为0,则设置ownerId为0，如果keepOldOwner == true则原来ownerId != 0的保持不变<br>
+	 * 软件类资产直接变更新状态即可
+	 */
+	@Override
+	public int changeState(Set<Long> ids, byte type, byte newState, long ownerId, boolean keepOldOwner) {
+		int count = 0;
+		if (ids.size() > 0) {
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("p_newState", newState);
+			params.put("p_ids", ids);
+			if (type == AssetConstants.SOFTWARE_ASSET) {
+				String hql = "update Software set state = :p_newState where id in (:p_ids)";
+				count = swDao.executeHql(hql, params);
+			} else if (type == AssetConstants.HARDWARE_ASSET) {
+				long newOwnerId = (newState == AssetConstants.IN_USE) ? ownerId : 0;
+				if (keepOldOwner) {
+					// 保留原有的ownerId
+					String hql = "update Hardware set state = :p_newState where id in (:p_ids) and ownerId <> 0";
+					count += hwDao.executeHql(hql, params);
+					hql = "update Hardware set state = :p_newState, ownerId = :p_newOwnerId where id in (:p_ids) and ownerId = 0";
+					params.put("p_newOwnerId", newOwnerId);
+					count += hwDao.executeHql(hql, params);
+				} else {
+					String hql = "update Hardware set state = :p_newState, ownerId = :p_newOwnerId where id in (:p_ids)";
+					params.put("p_newOwnerId", newOwnerId);
+					count = hwDao.executeHql(hql, params);
+				}
+			}
+		}
+		return count;
+	}
 }

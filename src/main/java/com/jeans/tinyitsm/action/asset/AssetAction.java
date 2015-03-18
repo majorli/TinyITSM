@@ -410,25 +410,67 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 
 	/**
 	 * 检查可以设置的下一种状态<br>
-	 * <ul>软件类资产：
+	 * <ul>
+	 * 软件类资产：
 	 * <li>在用 -> 备用/淘汰
 	 * <li>备用 -> 在用/淘汰
-	 * <li>淘汰 -> null
-	 * <br><br>
+	 * <li>淘汰 -> null <br>
+	 * <br>
 	 * 硬件类资产(状态变为在用时需要选择责任人)：
 	 * <li>在用 -> 在用/备用/维修
 	 * <li>备用 -> 在用/维修/淘汰
 	 * <li>维修 -> 在用/备用/淘汰（转移为在用时默认选中原责任人，如果有的话）
 	 * <li>淘汰 -> 报损
-	 * <li>报损 -> null
-	 * <br><br>
+	 * <li>报损 -> null <br>
+	 * <br>
 	 * 多项资产一起检查时取各项交集，可能为空
+	 * 
 	 * @return
 	 * @throws Exception
 	 */
 	@Action(value = "check-state", results = { @Result(type = "json", params = { "root", "nextStates" }) })
 	public String checkState() throws Exception {
 		nextStates = assetService.checkNextStates(splitIds(), type);
+		return SUCCESS;
+	}
+
+	private byte state; // 新资产状态
+	private long owner; // 新资产责任人（硬件类）
+	private boolean keep; // 是否保留原有的责任人（多个资产同时修改时）
+
+	public byte getState() {
+		return state;
+	}
+
+	public void setState(byte state) {
+		this.state = state;
+	}
+
+	public long getOwner() {
+		return owner;
+	}
+
+	public void setOwner(long owner) {
+		this.owner = owner;
+	}
+
+	public boolean isKeep() {
+		return keep;
+	}
+
+	public void setKeep(boolean keep) {
+		this.keep = keep;
+	}
+
+	/**
+	 * 调整资产的使用状态
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value = "change-state", results = { @Result(type = "json", params = { "root", "result" }) })
+	public String changeState() throws Exception {
+		result = assetService.changeState(splitIds(), type, state, owner, keep);
 		return SUCCESS;
 	}
 }

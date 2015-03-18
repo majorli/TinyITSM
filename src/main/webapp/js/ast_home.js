@@ -225,6 +225,19 @@ $(function() {
 					}
 				} ]
 			});
+			$("#aState").dialog({
+				"buttons" : [ {
+					"text" : "确定",
+					"iconCls" : "icon-saved",
+					"handler" : grid.changeState
+				}, {
+					"text" : "取消",
+					"iconCls" : "icon-multiple",
+					"handler" : function() {
+						$("#aState").dialog("close");
+					}
+				} ]
+			});
 		},
 		"loadHardware" : function() {
 			var c = $("#hwCatalog").combobox("getValue");
@@ -383,10 +396,12 @@ $(function() {
 				data["props.license"] = grid._getValue("license");
 				data["props.expiredTime"] = grid._getValue("expiredTime");
 			}
+			$.waitbox("正在保存");
 			$.ajax({
 				"url" : "asset/save-props",
 				"data" : data,
 				"success" : function(result) {
+					$.waitbox();
 					$.msgbox("消息", result + "项资产属性修改成功。", "info");
 					if (tab == 0) {
 						$("#hardware").datagrid("reload");
@@ -464,9 +479,11 @@ $(function() {
 			if (tab == 0) {
 				data.type = 1;
 				sel = $("#hardware").datagrid("getSelections");
+				$("#p_dept,#p_empl,#p_keep").show();
 			} else if (tab == 1) {
 				data.type = 3;
 				sel = $("#software").datagrid("getSelections");
+				$("#p_dept,#p_empl,#p_keep").hide();
 			} else {
 				return;
 			}
@@ -487,15 +504,71 @@ $(function() {
 					} else {
 						// TODO 生成状态转移对话框
 						var st = [];
+						var stNames = [ "在用", "淘汰", "维修", "备用", "报损" ];
 						$.each(nextStates, function(i, n) {
-
+							var t = {};
+							t.id = +n;
+							t.text = stNames[t.id];
+							st.push(t);
 						});
-
+						$("#v_state").combobox({
+							"data" : st,
+							"value" : +nextStates[0]
+						});
+						$("#v_dept").combotree("clear");
+						$("#v_empl").combobox("clear");
+						$("#v_keep").prop("checked", false);
 						// 打开对话框
 						$("#aState").dialog("open");
 					}
 				}
 			});
+		},
+		"changeState" : function() {
+			var data = {
+				"ids" : "",
+				"type" : 0,
+				"state" : +$("#v_state").combobox("getValue"),
+				"owner" : +$("#v_empl").combobox("getValue"),
+				"keep" : $("#v_keep").prop("checked")
+			};
+			var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
+			var sel = [];
+			if (tab == 0) {
+				data.type = 1;
+				sel = $("#hardware").datagrid("getSelections");
+			} else if (tab == 1) {
+				data.type = 3;
+				sel = $("#software").datagrid("getSelections");
+			}
+			if (sel.length == 0) {
+				return;
+			}
+			var id = [];
+			$.each(sel, function(i, n) {
+				id.push(n.id);
+			});
+			data.ids = id.join();
+			if (data.type == 1 && data.state == 0 && data.owner == 0) {
+				// 如果硬件设备状态值是在用，则必须有责任人
+				$.msgbox("错误", "硬件类资产状态为在用时必须选择一个责任人。", "warning");
+			} else {
+				$.waitbox("正在调整");
+				$.ajax({
+					"url" : "asset/change-state",
+					"data" : data,
+					"success" : function(result) {
+						$.waitbox();
+						$.msgbox("消息", result + "项资产状态调整成功。", "info");
+						if (tab == 0) {
+							$("#hardware").datagrid("reload");
+						} else {
+							$("#software").datagrid("reload");
+						}
+						$("#aState").dialog("close");
+					}
+				});
+			}
 		}
 	};
 
