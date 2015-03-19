@@ -15,7 +15,7 @@ It also provides a tiny IT knowledgebase to store and get documents.<br>
 
 ### Database
 - We use **MySQL 5.6** as our database.
-- It's recommended to remain the Hibernate property "hibernate.hbm2ddl.auto" with value "auto", so that Hibernate will create all of the tables needed when you launche tomcat the first time. After that, delete or comment off this property immediately, import initial data using ***deployment/database/companies.sql***, then reload application.
+- It's recommended to remain the Hibernate property "hibernate.hbm2ddl.auto" with value "auto", so that Hibernate will create all of the tables needed when you launche tomcat the first time. After that, delete or comment off this property immediately, import initial data using ***deployment/database/companies.sql*** and ***deployment/database/functions.sql***, then reload application.
 - **Note:** MySQL connector/J package (***mysql-connector-java-5.1.34.jar***) must be put into ***{TOMCAT_HOME}/lib/***.
 
 ### Log4j 2
@@ -44,6 +44,6 @@ It also provides a tiny IT knowledgebase to store and get documents.<br>
 - Deploy **TinyITSM** and **TinyConn** on tomcat server, using config files in ***deployment/linux*** and ***deployment/tomcat*** folders.
 - Create a folder in a large volumn and create a soft link point to it in ***{TinyITSM_context_root}*** folder named **cloud**.
 - Launch tomcat for the first time.
-- Import initial data from ***deployment/companies.sql***.
+- Import initial data from ***deployment/companies.sql*** and ***deployment/functions.sql***.
 - Modify ***{TinyITSM_context_root}/WEB-INF/classes/spring.xml*** file, delete or comment off the Hibernate property **hibernate.hbm2ddl.auto**.
 - Reload **TinyITSM** or relaunch the tomcat server.
