@@ -387,7 +387,8 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 				break;
 			case AssetConstants.INVALID_OWNER_COMPANY:
 				builder.append("错误：").append(r.getAssetCatalogName()).append("<span>[").append(r.getAssetFullName()).append("]</span>登记的责任人<span>[")
-						.append(r.getOwnerName()).append("]</span>属于<span>[").append(r.getOwnerCompanyName()).append("]</span>，不是本公司员工！");
+						.append(r.getOwnerName()).append("]</span>属于<span>[").append(r.getOwnerCompanyName())
+						.append("]</span>，不是本公司员工！&emsp;<a href=\"javascript:void(0);\" class=\"_Chcmp\">调整所属公司</a>");
 				break;
 			case AssetConstants.IN_USE_ASSET_WITHOUT_OWNER:
 				builder.append("疑问：").append(r.getAssetCatalogName()).append("<span>[").append(r.getAssetFullName()).append("]</span>使用状态为在用，但没有登记责任人！");
@@ -471,6 +472,33 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 	@Action(value = "change-state", results = { @Result(type = "json", params = { "root", "result" }) })
 	public String changeState() throws Exception {
 		result = assetService.changeState(splitIds(), type, state, owner, keep);
+		return SUCCESS;
+	}
+
+	/**
+	 * 根据校验结果调整硬件类资产数据的调整方式<br>
+	 * 0=调整责任人，1=回收资产，2=根据责任人调整所属公司
+	 */
+	private byte adjustType;
+
+	public byte getAdjustType() {
+		return adjustType;
+	}
+
+	public void setAdjustType(byte adjustType) {
+		this.adjustType = adjustType;
+	}
+
+	/**
+	 * 根据校验结果调整硬件类资产数据的调整方式，每次调整一项，提交id属性<br>
+	 * adjustType: 0=调整责任人(需要提交owner属性); 1=回收资产; 2=根据责任人调整所属公司
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value = "adjust", results = { @Result(type = "json", params = { "root", "result" }) })
+	public String adjust() throws Exception {
+		result = assetService.adjust(id, adjustType, owner);
 		return SUCCESS;
 	}
 }

@@ -119,4 +119,17 @@ public interface AssetService {
 	 * @return
 	 */
 	public int changeState(Set<Long> ids, byte type, byte newState, long ownerId, boolean keepOldOwner);
+
+	/**
+	 * 根据校验结果调整一项硬件类资产的数据
+	 * 
+	 * @param id
+	 *            资产id
+	 * @param adjustType
+	 *            调整方式：0=调整责任人(需要提交owner属性); 1=回收资产; 2=根据责任人调整所属公司
+	 * @param ownerId
+	 *            责任人id
+	 * @return
+	 */
+	public int adjust(long id, byte adjustType, long ownerId);
 }

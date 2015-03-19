@@ -536,6 +536,7 @@ public class AssetServiceImpl implements AssetService {
 	 * 软件类资产直接变更新状态即可
 	 */
 	@Override
+	@Transactional
 	public int changeState(Set<Long> ids, byte type, byte newState, long ownerId, boolean keepOldOwner) {
 		int count = 0;
 		if (ids.size() > 0) {
@@ -558,6 +559,29 @@ public class AssetServiceImpl implements AssetService {
 					String hql = "update Hardware set state = :p_newState, ownerId = :p_newOwnerId where id in (:p_ids)";
 					params.put("p_newOwnerId", newOwnerId);
 					count = hwDao.executeHql(hql, params);
+				}
+			}
+		}
+		return count;
+	}
+
+	@Override
+	@Transactional
+	public int adjust(long id, byte adjustType, long ownerId) {
+		int count = 0;
+		if (id > 0) {
+			switch (adjustType) {
+			case 0:		// 调整责任人
+				count = hwDao.executeHql("update Hardware set ownerId = " + ownerId + " where id = " + id);
+				break;
+			case 1:		// 回收资产（状态设置为IDLE，责任人id设置为0）
+				count = hwDao.executeHql("update Hardware set state = 3, ownerId = 0 where id = " + id);
+				break;
+			case 2:		// 根据责任人调整所属公司
+				Hardware asset = hwDao.getById(Hardware.class, id);
+				Employee owner = hrService.getEmployee(asset.getOwnerId());
+				if (null != owner) {
+					count = hwDao.executeHql("update Hardware set companyId = " + owner.getDepartment().getSubRoot().getId() + " where id = " + id);
 				}
 			}
 		}

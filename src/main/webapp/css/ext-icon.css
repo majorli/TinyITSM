@@ -303,6 +303,9 @@
 .icon-table-lightning {
 	background: url('ext-icons/table_lightning.png') no-repeat center center;
 }
+.icon-vcard {
+	background: url('ext-icons/vcard.png') no-repeat center center;
+}
 .icon-vcard-add {
 	background: url('ext-icons/vcard_add.png') no-repeat center center;
 }

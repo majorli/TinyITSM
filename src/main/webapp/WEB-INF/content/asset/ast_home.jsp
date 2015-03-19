@@ -86,6 +86,8 @@
 		<div id="p_empl" class="TinyLine"><span>责任人：</span><input id="v_empl" class="easyui-combobox" data-options="editable:false,valueField:'id',textField:'name'" /></div>
 		<div id="p_keep" class="TinyLine"><label><input type="checkbox" id="v_keep" style="margin-right:.5em;" />其中原先具有责任人的资产保持其原有责任人不变</label></div>
 	</div>
+	<input id="v_ids" type="hidden" />
+	<input id="v_type" type="hidden" />
 	<iframe name="dlerr" style="display:none"></iframe>
 	<form id="exportForm" action="asset/export-assets" method="post" target="dlerr"><input type="hidden" id="exportType" name="type"/></form>
 	<%@ include file="../html/footer.jsp"%>
