@@ -320,9 +320,17 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 	/**
 	 * 保存一到多个资产的属性编辑结果，数值型属性可能传入负数，日期型属性可能传入空串，选择型属性可能传入-99，字符串属性可能传入空串<br>
 	 * 所有类型的属性传入到Map中全部是String类型，需要自己做类型转换，由于前端使用了严格的验证所以类型转换可以不考虑异常情况<br>
-	 * <br>
-	 * 当只编辑一项资产时： <li>数值型属性为负数时保存该属性的最小值； <li>日期型属性为空串时保存为null； <li>选择型属性为-99时保持原值不变； <li>字符串属性直接保存。<br>
-	 * 当编辑多项资产时：<br> <li>数值型属性为负数时保持各项资产该属性原值不变； <li>日期型属性为空串时保持各项资产该属性原值不变； <li>选择型属性为-99时保持各项资产该属性原值不变； <li>字符串属性为空串时保持各项资产该属性原值不变。
+	 * <ul>
+	 * 当只编辑一项资产时：
+	 * <li>数值型属性为负数时保存该属性的最小值；
+	 * <li>日期型属性为空串时保存为null；
+	 * <li>选择型属性为-99时保持原值不变；
+	 * <li>字符串属性直接保存。<br>
+	 * 当编辑多项资产时：<br>
+	 * <li>数值型属性为负数时保持各项资产该属性原值不变；
+	 * <li>日期型属性为空串时保持各项资产该属性原值不变；
+	 * <li>选择型属性为-99时保持各项资产该属性原值不变；
+	 * <li>字符串属性为空串时保持各项资产该属性原值不变。 <br>
 	 * 
 	 * @return
 	 * @throws Exception
@@ -348,12 +356,15 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 			String value = ((String[]) props.get(key))[0];
 			if ("expiredTime".equals(key) || "purchaseTime".equals(key)) {
 				p.put(key, "".equals(value) ? null : (new SimpleDateFormat("yyyy-MM-dd")).parse(value));
-			} else if ("quantity".equals(key)) {
+			} else if ("quantity".equals(key) || "number".equals(key)) {
 				p.put(key, Integer.parseInt(value));
 			} else if ("cost".equals(key)) {
 				p.put(key, BigDecimal.valueOf(Double.parseDouble(value)));
-			} else if ("warranty".equals(key) || "importance".equals(key) || "softwareType".equals(key)) {
+			} else if ("warranty".equals(key) || "importance".equals(key) || "softwareType".equals(key) || "type".equals(key) || "catalog".equals(key)
+					|| "state".equals(key)) {
 				p.put(key, Byte.parseByte(value));
+			} else if ("ownerId".equals(key)) {
+				p.put(key, Long.parseLong(value));
 			} else {
 				p.put(key, value);
 			}
@@ -499,6 +510,23 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 	@Action(value = "adjust", results = { @Result(type = "json", params = { "root", "result" }) })
 	public String adjust() throws Exception {
 		result = assetService.adjust(id, adjustType, owner);
+		return SUCCESS;
+	}
+
+	@Action(value = "new-assets", results = { @Result(type = "json", params = { "root", "result" }) })
+	public String newAsset() throws Exception {
+		// TODO 添加新的资产
+		Map<String, Object> form = transProps();
+		Set<String> ks = form.keySet();
+		for (String key : ks) {
+			Object value = form.get(key);
+			if (null == value) {
+				System.out.println("key=" + key + ", value='null'");
+			} else {
+				System.out.println("key=" + key + ", value='" + value + "', type is " + value.getClass().getCanonicalName());
+			}
+		}
+		result = 0;
 		return SUCCESS;
 	}
 }
