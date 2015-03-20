@@ -132,4 +132,15 @@ public interface AssetService {
 	 * @return
 	 */
 	public int adjust(long id, byte adjustType, long ownerId);
+
+	/**
+	 * 添加新的资产，资产的属性和记录数除所属公司id外全部通过props传入
+	 * 
+	 * @param props
+	 *            资产的属性和记录数
+	 * @param companyId
+	 *            所属公司id
+	 * @return
+	 */
+	public int createNewAssets(Map<String, Object> props, long companyId);
 }

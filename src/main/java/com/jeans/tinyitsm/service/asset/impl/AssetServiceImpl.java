@@ -1,6 +1,8 @@
 package com.jeans.tinyitsm.service.asset.impl;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -571,13 +574,13 @@ public class AssetServiceImpl implements AssetService {
 		int count = 0;
 		if (id > 0) {
 			switch (adjustType) {
-			case 0:		// 调整责任人
+			case 0: // 调整责任人
 				count = hwDao.executeHql("update Hardware set ownerId = " + ownerId + " where id = " + id);
 				break;
-			case 1:		// 回收资产（状态设置为IDLE，责任人id设置为0）
+			case 1: // 回收资产（状态设置为IDLE，责任人id设置为0）
 				count = hwDao.executeHql("update Hardware set state = 3, ownerId = 0 where id = " + id);
 				break;
-			case 2:		// 根据责任人调整所属公司
+			case 2: // 根据责任人调整所属公司
 				Hardware asset = hwDao.getById(Hardware.class, id);
 				Employee owner = hrService.getEmployee(asset.getOwnerId());
 				if (null != owner) {
@@ -586,5 +589,93 @@ public class AssetServiceImpl implements AssetService {
 			}
 		}
 		return count;
+	}
+
+	@Override
+	@Transactional
+	public int createNewAssets(Map<String, Object> props, long companyId) {
+		byte type = (byte) props.get("type");
+		int number = (int) props.get("number");
+		Asset prototype = null;
+		if (type == AssetConstants.HARDWARE_ASSET) {
+			prototype = new Hardware();
+		} else {
+			prototype = new Software();
+		}
+		prototype.setType(type);
+		prototype.setCatalog((byte) props.get("catalog"));
+		prototype.setCompanyId(companyId);
+		prototype.setName((String) props.get("name"));
+		prototype.setModelOrVersion((String) props.get("modelOrVersion"));
+		prototype.setVendor((String) props.get("vendor"));
+		prototype.setAssetUsage((String) props.get("assetUsage"));
+		prototype.setPurchaseTime((Date) props.get("purchaseTime"));
+		prototype.setQuantity((int) props.get("quantity"));
+		prototype.setCost((BigDecimal) props.get("cost"));
+		prototype.setState((byte) props.get("state"));
+		prototype.setComment((String) props.get("comment"));
+		if (prototype instanceof Hardware) {
+			String code = (String) props.get("code");
+			if (prototype.getQuantity() > 1) {
+				code += "#1~" + prototype.getQuantity();
+			}
+			((Hardware) prototype).setCode(code);
+			((Hardware) prototype).setFinancialCode((String) props.get("financialCode"));
+			((Hardware) prototype).setSn((String) props.get("sn"));
+			((Hardware) prototype).setConfiguration((String) props.get("configuration"));
+			byte warranty = (byte) props.get("warranty");
+			if (warranty < -1) {
+				warranty = AssetConstants.IMPLIED_WARRANTY;
+			}
+			((Hardware) prototype).setWarranty(warranty);
+			((Hardware) prototype).setLocation((String) props.get("location"));
+			((Hardware) prototype).setIp((String) props.get("ip"));
+			byte importance = (byte) props.get("importance");
+			if (importance < 0) {
+				importance = AssetConstants.GENERAL_DEGREE;
+			}
+			((Hardware) prototype).setImportance(importance);
+			long ownerId = (long) props.get("ownerId");
+			if (ownerId < 0) {
+				ownerId = 0;
+			}
+			((Hardware) prototype).setOwnerId(ownerId);
+		} else if (prototype instanceof Software) {
+			byte softwareType = (byte) props.get("softwareType");
+			if (softwareType < 0) {
+				((Software) prototype).setSoftwareType(AssetConstants.OTHER_TYPE_SOFTWARE);
+			} else {
+				((Software) prototype).setSoftwareType(softwareType);
+			}
+			((Software) prototype).setLicense((String) props.get("license"));
+			((Software) prototype).setExpiredTime((Date) props.get("expiredTime"));
+		}
+		Set<Serializable> ids = new HashSet<Serializable>();
+		if (number > 1) {
+			if (prototype instanceof Hardware) {
+				DecimalFormat df = new DecimalFormat("000");
+				String prototypeCode = ((Hardware) prototype).getCode();
+				for (int n = 1; n <= number; n++) {
+					Hardware hw = new Hardware();
+					BeanUtils.copyProperties(prototype, hw);
+					hw.setCode(prototypeCode + "[" + df.format(n) + "]");
+					ids.add(hwDao.save(hw));
+				}
+			} else {
+				while (number-- > 0) {
+					Software sw = new Software();
+					BeanUtils.copyProperties(prototype, sw);
+					ids.add(swDao.save(sw));
+				}
+			}
+		} else {
+			if (type == AssetConstants.HARDWARE_ASSET) {
+				ids.add(hwDao.save((Hardware) prototype));
+			} else {
+				ids.add(swDao.save((Software) prototype));
+			}
+		}
+		ids.remove(null);
+		return ids.size();
 	}
 }

@@ -515,18 +515,7 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 
 	@Action(value = "new-assets", results = { @Result(type = "json", params = { "root", "result" }) })
 	public String newAsset() throws Exception {
-		// TODO 添加新的资产
-		Map<String, Object> form = transProps();
-		Set<String> ks = form.keySet();
-		for (String key : ks) {
-			Object value = form.get(key);
-			if (null == value) {
-				System.out.println("key=" + key + ", value='null'");
-			} else {
-				System.out.println("key=" + key + ", value='" + value + "', type is " + value.getClass().getCanonicalName());
-			}
-		}
-		result = 0;
+		result = assetService.createNewAssets(transProps(), getCurrentCompanyId());
 		return SUCCESS;
 	}
 }
