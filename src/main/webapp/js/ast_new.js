@@ -76,9 +76,21 @@ $(function() {
 				} else {
 					return dt;
 				}
-			} else if (key == "warranty" || key == "importance" || key == "softwareType" || key == "state" || key == "type" || key == "catalog" || key == "empl") {
+			} else if (key == "warranty" || key == "importance") {
 				if ($(ele).combobox("getValue") == null || $(ele).combobox("getText") == "") {
-					return -99;
+					return 0;	// 取默认值"在保"和"普通"
+				} else {
+					return +$(ele).combobox("getValue");
+				}
+			} else if (key == "softwareType") {
+				if ($(ele).combobox("getValue") == null || $(ele).combobox("getText") == "") {
+					return 6;	// 取默认值"其他类型软件"
+				} else {
+					return +$(ele).combobox("getValue");
+				}
+			} else if (key == "empl") {
+				if ($(ele).combobox("getValue") == null || $(ele).combobox("getText") == "") {
+					return 0;	// 无责任人
 				} else {
 					return +$(ele).combobox("getValue");
 				}
@@ -135,7 +147,7 @@ $(function() {
 		"_submit" : function() {
 			if ($("#newAssets").form("validate")) {	// 校验：超长字段，必填字段（资产类别，目前使用情况）
 				var data = page._serializeForm();
-				if (data["props.type"] == 1 && data["props.state"] == 0 && data["props.ownerId"] == -99) {
+				if (data["props.type"] == 1 && data["props.state"] == 0 && data["props.ownerId"] == 0) {
 					$.msgbox("错误", "使用情况为在用的硬件类资产必须选择一个责任人！", "warning");
 				} else {
 					$.waitbox("正在保存");

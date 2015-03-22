@@ -3,6 +3,7 @@ package com.jeans.tinyitsm.model.asset;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -58,8 +59,47 @@ public class Asset implements Serializable {
 		} else if (type == AssetConstants.SOFTWARE_ASSET) {
 			return new Software();
 		} else {
-			return new Asset();
+			return null;
 		}
+	}
+
+	public static Asset createAsset(Map<String, Object> properties, long companyId, byte type) {
+		Asset asset = Asset.createAsset(type);
+		if (null != asset) {
+			asset.setCompanyId(companyId);
+			asset.setType(type);
+			asset.setCatalog((byte) properties.get("catalog"));
+			asset.setName((String) properties.get("name"));
+			asset.setVendor((String) properties.get("vendor"));
+			asset.setModelOrVersion((String) properties.get("modelOrVersion"));
+			asset.setAssetUsage((String) properties.get("assetUsage"));
+			asset.setPurchaseTime((Date) properties.get("purchaseTime"));
+			int quantity = (int) properties.get("quantity");
+			asset.setQuantity(quantity);
+			asset.setCost((BigDecimal) properties.get("cost"));
+			asset.setState((byte) properties.get("state"));
+			asset.setComment((String) properties.get("comment"));
+			if (asset instanceof Hardware) {
+				((Hardware) asset).setSn((String) properties.get("sn"));
+				((Hardware) asset).setConfiguration((String) properties.get("configuration"));
+				((Hardware) asset).setWarranty((byte) properties.get("warranty"));
+				((Hardware) asset).setLocation((String) properties.get("location"));
+				((Hardware) asset).setIp((String) properties.get("ip"));
+				((Hardware) asset).setImportance((byte) properties.get("importance"));
+				((Hardware) asset).setOwnerId((long) properties.get("ownerId"));
+				String code = (String) properties.get("code");
+				if (quantity > 1) {
+					code += "#1~" + quantity;
+				}
+				((Hardware) asset).setCode(code);
+				((Hardware) asset).setFinancialCode((String) properties.get("financialCode"));
+			} else if (asset instanceof Software) {
+				((Software) asset).setSoftwareType((byte) properties.get("softwareType"));
+				((Software) asset).setLicense((String) properties.get("license"));
+				((Software) asset).setExpiredTime((Date) properties.get("expiredTime"));
+			}
+		}
+		return asset;
 	}
 
 	@Id

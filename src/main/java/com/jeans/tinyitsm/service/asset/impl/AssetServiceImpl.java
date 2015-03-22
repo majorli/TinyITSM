@@ -193,42 +193,13 @@ public class AssetServiceImpl implements AssetService {
 	@Override
 	@Transactional
 	public Asset newAsset(Map<String, Object> properties, byte type) {
-		Asset asset = Asset.createAsset(type);
-		asset.setCompanyId((long) properties.get("companyId"));
-		asset.setType(type);
-		asset.setCatalog((byte) properties.get("catalog"));
-		asset.setName((String) properties.get("name"));
-		asset.setVendor((String) properties.get("vendor"));
-		asset.setModelOrVersion((String) properties.get("modelOrVersion"));
-		asset.setAssetUsage((String) properties.get("assetUsage"));
-		asset.setPurchaseTime((Date) properties.get("purchaseTime"));
-		int quantity = (int) properties.get("quantity");
-		asset.setQuantity(quantity);
-		asset.setCost((BigDecimal) properties.get("cost"));
-		asset.setState((byte) properties.get("state"));
-		asset.setComment((String) properties.get("comment"));
-		if (asset instanceof Hardware) {
-			((Hardware) asset).setSn((String) properties.get("sn"));
-			((Hardware) asset).setConfiguration((String) properties.get("configuration"));
-			((Hardware) asset).setWarranty((byte) properties.get("warranty"));
-			((Hardware) asset).setLocation((String) properties.get("location"));
-			((Hardware) asset).setIp((String) properties.get("ip"));
-			((Hardware) asset).setImportance((byte) properties.get("importance"));
-			((Hardware) asset).setOwnerId((long) properties.get("ownerId"));
-			String code = (String) properties.get("code");
-			if (quantity > 1) {
-				code += "#1~" + quantity;
+		Asset asset = Asset.createAsset(properties, (long) properties.get("companyId"), type);
+		if (null != asset) {
+			if (asset instanceof Hardware) {
+				hwDao.save((Hardware) asset);
+			} else if (asset instanceof Software) {
+				swDao.save((Software) asset);
 			}
-			((Hardware) asset).setCode(code);
-			((Hardware) asset).setFinancialCode((String) properties.get("financialCode"));
-			hwDao.save((Hardware) asset);
-		} else if (asset instanceof Software) {
-			((Software) asset).setSoftwareType((byte) properties.get("softwareType"));
-			((Software) asset).setLicense((String) properties.get("license"));
-			((Software) asset).setExpiredTime((Date) properties.get("expiredTime"));
-			swDao.save((Software) asset);
-		} else {
-			asDao.save(asset);
 		}
 		return asset;
 	}
@@ -596,86 +567,35 @@ public class AssetServiceImpl implements AssetService {
 	public int createNewAssets(Map<String, Object> props, long companyId) {
 		byte type = (byte) props.get("type");
 		int number = (int) props.get("number");
-		Asset prototype = null;
-		if (type == AssetConstants.HARDWARE_ASSET) {
-			prototype = new Hardware();
-		} else {
-			prototype = new Software();
-		}
-		prototype.setType(type);
-		prototype.setCatalog((byte) props.get("catalog"));
-		prototype.setCompanyId(companyId);
-		prototype.setName((String) props.get("name"));
-		prototype.setModelOrVersion((String) props.get("modelOrVersion"));
-		prototype.setVendor((String) props.get("vendor"));
-		prototype.setAssetUsage((String) props.get("assetUsage"));
-		prototype.setPurchaseTime((Date) props.get("purchaseTime"));
-		prototype.setQuantity((int) props.get("quantity"));
-		prototype.setCost((BigDecimal) props.get("cost"));
-		prototype.setState((byte) props.get("state"));
-		prototype.setComment((String) props.get("comment"));
-		if (prototype instanceof Hardware) {
-			String code = (String) props.get("code");
-			if (prototype.getQuantity() > 1) {
-				code += "#1~" + prototype.getQuantity();
-			}
-			((Hardware) prototype).setCode(code);
-			((Hardware) prototype).setFinancialCode((String) props.get("financialCode"));
-			((Hardware) prototype).setSn((String) props.get("sn"));
-			((Hardware) prototype).setConfiguration((String) props.get("configuration"));
-			byte warranty = (byte) props.get("warranty");
-			if (warranty < -1) {
-				warranty = AssetConstants.IMPLIED_WARRANTY;
-			}
-			((Hardware) prototype).setWarranty(warranty);
-			((Hardware) prototype).setLocation((String) props.get("location"));
-			((Hardware) prototype).setIp((String) props.get("ip"));
-			byte importance = (byte) props.get("importance");
-			if (importance < 0) {
-				importance = AssetConstants.GENERAL_DEGREE;
-			}
-			((Hardware) prototype).setImportance(importance);
-			long ownerId = (long) props.get("ownerId");
-			if (ownerId < 0) {
-				ownerId = 0;
-			}
-			((Hardware) prototype).setOwnerId(ownerId);
-		} else if (prototype instanceof Software) {
-			byte softwareType = (byte) props.get("softwareType");
-			if (softwareType < 0) {
-				((Software) prototype).setSoftwareType(AssetConstants.OTHER_TYPE_SOFTWARE);
-			} else {
-				((Software) prototype).setSoftwareType(softwareType);
-			}
-			((Software) prototype).setLicense((String) props.get("license"));
-			((Software) prototype).setExpiredTime((Date) props.get("expiredTime"));
-		}
+		Asset prototype = Asset.createAsset(props, companyId, type);
 		Set<Serializable> ids = new HashSet<Serializable>();
-		if (number > 1) {
-			if (prototype instanceof Hardware) {
-				DecimalFormat df = new DecimalFormat("000");
-				String prototypeCode = ((Hardware) prototype).getCode();
-				for (int n = 1; n <= number; n++) {
-					Hardware hw = new Hardware();
-					BeanUtils.copyProperties(prototype, hw);
-					hw.setCode(prototypeCode + "[" + df.format(n) + "]");
-					ids.add(hwDao.save(hw));
+		if (null != prototype) {
+			if (number > 1) {
+				if (prototype instanceof Hardware) {
+					DecimalFormat df = new DecimalFormat("000");
+					String prototypeCode = ((Hardware) prototype).getCode();
+					for (int n = 1; n <= number; n++) {
+						Hardware hw = new Hardware();
+						BeanUtils.copyProperties(prototype, hw);
+						hw.setCode(prototypeCode + "[" + df.format(n) + "]");
+						ids.add(hwDao.save(hw));
+					}
+				} else {
+					while (number-- > 0) {
+						Software sw = new Software();
+						BeanUtils.copyProperties(prototype, sw);
+						ids.add(swDao.save(sw));
+					}
 				}
 			} else {
-				while (number-- > 0) {
-					Software sw = new Software();
-					BeanUtils.copyProperties(prototype, sw);
-					ids.add(swDao.save(sw));
+				if (type == AssetConstants.HARDWARE_ASSET) {
+					ids.add(hwDao.save((Hardware) prototype));
+				} else {
+					ids.add(swDao.save((Software) prototype));
 				}
 			}
-		} else {
-			if (type == AssetConstants.HARDWARE_ASSET) {
-				ids.add(hwDao.save((Hardware) prototype));
-			} else {
-				ids.add(swDao.save((Software) prototype));
-			}
+			ids.remove(null);
 		}
-		ids.remove(null);
 		return ids.size();
 	}
 }
