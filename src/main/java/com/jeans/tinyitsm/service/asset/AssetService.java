@@ -8,6 +8,8 @@ import com.jeans.tinyitsm.model.asset.Asset;
 import com.jeans.tinyitsm.model.view.AssetItem;
 import com.jeans.tinyitsm.model.view.AssetValidateResult;
 import com.jeans.tinyitsm.model.view.Grid;
+import com.jeans.tinyitsm.model.view.HRUnit;
+import com.jeans.tinyitsm.model.view.HardwareItem;
 
 public interface AssetService {
 
@@ -143,4 +145,13 @@ public interface AssetService {
 	 * @return
 	 */
 	public int createNewAssets(Map<String, Object> props, long companyId);
+
+	/**
+	 * 获取某个用户所配属的硬件设备类资产
+	 * 
+	 * @param owner
+	 *            责任人的HRUnit对象
+	 * @return
+	 */
+	public List<HardwareItem> loadEquipmentsByOwner(HRUnit owner);
 }

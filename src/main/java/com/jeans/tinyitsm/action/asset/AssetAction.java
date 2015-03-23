@@ -518,4 +518,20 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 		result = assetService.createNewAssets(transProps(), getCurrentCompanyId());
 		return SUCCESS;
 	}
+
+	private List<HardwareItem> owned;
+
+	public List<HardwareItem> getOwned() {
+		return owned;
+	}
+
+	public void setOwned(List<HardwareItem> owned) {
+		this.owned = owned;
+	}
+
+	@Action(value = "owned-equipments", results = { @Result(type = "json", params = { "root", "owned" }) })
+	public String ownedEquipments() throws Exception {
+		owned = assetService.loadEquipmentsByOwner(getCurrentEmployee());
+		return SUCCESS;
+	}
 }

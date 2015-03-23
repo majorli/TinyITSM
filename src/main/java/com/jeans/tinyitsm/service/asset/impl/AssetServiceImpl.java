@@ -25,6 +25,7 @@ import com.jeans.tinyitsm.model.hr.Employee;
 import com.jeans.tinyitsm.model.view.AssetItem;
 import com.jeans.tinyitsm.model.view.AssetValidateResult;
 import com.jeans.tinyitsm.model.view.Grid;
+import com.jeans.tinyitsm.model.view.HRUnit;
 import com.jeans.tinyitsm.model.view.HardwareItem;
 import com.jeans.tinyitsm.model.view.SoftwareItem;
 import com.jeans.tinyitsm.service.asset.AssetConstants;
@@ -597,5 +598,20 @@ public class AssetServiceImpl implements AssetService {
 			ids.remove(null);
 		}
 		return ids.size();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<HardwareItem> loadEquipmentsByOwner(HRUnit owner) {
+		List<HardwareItem> list = new ArrayList<HardwareItem>();
+		if (null != owner) {
+			List<Hardware> assets = new ArrayList<Hardware>();
+			String hql = "from Hardware where ownerId = " + owner.getId() + " order by catalog, code, id";
+			assets.addAll(hwDao.find(hql));
+			for (Hardware asset : assets) {
+				list.add(HardwareItem.createInstance(asset, hrService.getUnit(asset.getCompanyId(), HRConstants.COMPANY), owner));
+			}
+		}
+		return list;
 	}
 }
