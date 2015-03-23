@@ -110,7 +110,6 @@ public class initAction extends TinyAction {
 		e.init();
 		initSuccess = (e.getErrorMessages() != null && hrListener != null);
 
-		// TODO: 事件处理器都需要在这里进行注入
 		HREventObserver.set(hrListener);
 
 		if (initSuccess) {
