@@ -6,7 +6,10 @@ import java.util.Set;
 
 import com.jeans.tinyitsm.model.asset.Asset;
 import com.jeans.tinyitsm.model.view.AssetItem;
+import com.jeans.tinyitsm.model.view.AssetValidateResult;
 import com.jeans.tinyitsm.model.view.Grid;
+import com.jeans.tinyitsm.model.view.HRUnit;
+import com.jeans.tinyitsm.model.view.HardwareItem;
 
 public interface AssetService {
 
@@ -81,4 +84,74 @@ public interface AssetService {
 	 * @return 实际更新数量
 	 */
 	public int saveProps(Set<Long> ids, byte type, Map<String, Object> props);
+
+	/**
+	 * 检查指定公司下的硬件类资产数据一致性
+	 * 
+	 * @param companyId
+	 *            公司id
+	 * @return
+	 */
+	public List<AssetValidateResult> validate(long companyId);
+
+	/**
+	 * 检查指定资产可以转移为的下一个状态，多项资产一起检查时取各项交集，可能为空
+	 * 
+	 * @param ids
+	 *            资产id集合
+	 * @param type
+	 *            资产类型
+	 * @return
+	 */
+	public Set<Byte> checkNextStates(Set<Long> ids, byte type);
+
+	/**
+	 * 批量调整资产的使用状态
+	 * 
+	 * @param ids
+	 *            资产id集合
+	 * @param type
+	 *            资产类型，硬件/软件
+	 * @param newState
+	 *            新的使用状态
+	 * @param ownerId
+	 *            责任人id（仅硬件类资产）
+	 * @param keepOldOwner
+	 *            是否保留原有的责任人（多个硬件类资产批量调整时）
+	 * @return
+	 */
+	public int changeState(Set<Long> ids, byte type, byte newState, long ownerId, boolean keepOldOwner);
+
+	/**
+	 * 根据校验结果调整一项硬件类资产的数据
+	 * 
+	 * @param id
+	 *            资产id
+	 * @param adjustType
+	 *            调整方式：0=调整责任人(需要提交owner属性); 1=回收资产; 2=根据责任人调整所属公司
+	 * @param ownerId
+	 *            责任人id
+	 * @return
+	 */
+	public int adjust(long id, byte adjustType, long ownerId);
+
+	/**
+	 * 添加新的资产，资产的属性和记录数除所属公司id外全部通过props传入
+	 * 
+	 * @param props
+	 *            资产的属性和记录数
+	 * @param companyId
+	 *            所属公司id
+	 * @return
+	 */
+	public int createNewAssets(Map<String, Object> props, long companyId);
+
+	/**
+	 * 获取某个用户所配属的硬件设备类资产
+	 * 
+	 * @param owner
+	 *            责任人的HRUnit对象
+	 * @return
+	 */
+	public List<HardwareItem> loadEquipmentsByOwner(HRUnit owner);
 }

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,9 +21,11 @@ import com.jeans.tinyitsm.model.asset.Asset;
 import com.jeans.tinyitsm.model.asset.Hardware;
 import com.jeans.tinyitsm.model.asset.Software;
 import com.jeans.tinyitsm.model.view.AssetItem;
+import com.jeans.tinyitsm.model.view.AssetValidateResult;
 import com.jeans.tinyitsm.model.view.Grid;
 import com.jeans.tinyitsm.model.view.HardwareItem;
 import com.jeans.tinyitsm.model.view.SoftwareItem;
+import com.jeans.tinyitsm.service.asset.AssetConstants;
 import com.jeans.tinyitsm.service.asset.AssetService;
 import com.jeans.tinyitsm.service.hr.HRConstants;
 import com.jeans.tinyitsm.service.hr.HRService;
@@ -317,7 +320,7 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 	/**
 	 * 保存一到多个资产的属性编辑结果，数值型属性可能传入负数，日期型属性可能传入空串，选择型属性可能传入-99，字符串属性可能传入空串<br>
 	 * 所有类型的属性传入到Map中全部是String类型，需要自己做类型转换，由于前端使用了严格的验证所以类型转换可以不考虑异常情况<br>
-	 * <br>
+	 * <ul>
 	 * 当只编辑一项资产时：
 	 * <li>数值型属性为负数时保存该属性的最小值；
 	 * <li>日期型属性为空串时保存为null；
@@ -327,7 +330,7 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 	 * <li>数值型属性为负数时保持各项资产该属性原值不变；
 	 * <li>日期型属性为空串时保持各项资产该属性原值不变；
 	 * <li>选择型属性为-99时保持各项资产该属性原值不变；
-	 * <li>字符串属性为空串时保持各项资产该属性原值不变。
+	 * <li>字符串属性为空串时保持各项资产该属性原值不变。 <br>
 	 * 
 	 * @return
 	 * @throws Exception
@@ -353,16 +356,182 @@ public class AssetAction extends BaseAction<Grid<AssetItem>> {
 			String value = ((String[]) props.get(key))[0];
 			if ("expiredTime".equals(key) || "purchaseTime".equals(key)) {
 				p.put(key, "".equals(value) ? null : (new SimpleDateFormat("yyyy-MM-dd")).parse(value));
-			} else if ("quantity".equals(key)) {
+			} else if ("quantity".equals(key) || "number".equals(key)) {
 				p.put(key, Integer.parseInt(value));
 			} else if ("cost".equals(key)) {
 				p.put(key, BigDecimal.valueOf(Double.parseDouble(value)));
-			} else if ("warranty".equals(key) || "importance".equals(key) || "softwareType".equals(key)) {
+			} else if ("warranty".equals(key) || "importance".equals(key) || "softwareType".equals(key) || "type".equals(key) || "catalog".equals(key)
+					|| "state".equals(key)) {
 				p.put(key, Byte.parseByte(value));
+			} else if ("ownerId".equals(key)) {
+				p.put(key, Long.parseLong(value));
 			} else {
 				p.put(key, value);
 			}
 		}
 		return p;
+	}
+
+	private Map<String, String> validation;
+
+	public Map<String, String> getValidation() {
+		return validation;
+	}
+
+	public void setValidation(Map<String, String> validation) {
+		this.validation = validation;
+	}
+
+	@Action(value = "asset-vali", results = { @Result(type = "json", params = { "root", "validation" }) })
+	public String vali() throws Exception {
+		validation = new LinkedHashMap<String, String>();
+		List<AssetValidateResult> v = assetService.validate(getCurrentCompanyId());
+		for (AssetValidateResult r : v) {
+			StringBuilder builder = new StringBuilder("<li>");
+			switch (r.getResult()) {
+			case AssetConstants.INVALID_OWNER:
+				builder.append("错误：").append(r.getAssetCatalogName()).append("<span>[").append(r.getAssetFullName()).append("]</span>登记的责任人不存在！");
+				break;
+			case AssetConstants.IN_USE_ASSET_OWNED_BY_FORMER_EMPLOYEE:
+				builder.append("错误：").append(r.getAssetCatalogName()).append("<span>[").append(r.getAssetFullName()).append("]</span>使用状态为在用，但登记的责任人<span>[")
+						.append(r.getOwnerName()).append("]</span>已经离职！");
+				break;
+			case AssetConstants.INVALID_OWNER_COMPANY:
+				builder.append("错误：").append(r.getAssetCatalogName()).append("<span>[").append(r.getAssetFullName()).append("]</span>登记的责任人<span>[")
+						.append(r.getOwnerName()).append("]</span>属于<span>[").append(r.getOwnerCompanyName())
+						.append("]</span>，不是本公司员工！&emsp;<a href=\"javascript:void(0);\" class=\"_Chcmp\">调整所属公司</a>");
+				break;
+			case AssetConstants.IN_USE_ASSET_WITHOUT_OWNER:
+				builder.append("疑问：").append(r.getAssetCatalogName()).append("<span>[").append(r.getAssetFullName()).append("]</span>使用状态为在用，但没有登记责任人！");
+			}
+			builder.append("&emsp;<a href=\"javascript:void(0);\" class=\"_Chown\">设置责任人</a>&emsp;<a href=\"javascript:void(0);\" class=\"_SetIdle\">回收该资产</a></li>");
+			validation.put(r.getId().toString(), builder.toString());
+		}
+		return SUCCESS;
+	}
+
+	private Set<Byte> nextStates;
+
+	public Set<Byte> getNextStates() {
+		return nextStates;
+	}
+
+	public void setNextStates(Set<Byte> nextStates) {
+		this.nextStates = nextStates;
+	}
+
+	/**
+	 * 检查可以设置的下一种状态<br>
+	 * <ul>
+	 * 软件类资产：
+	 * <li>在用 -> 备用/淘汰
+	 * <li>备用 -> 在用/淘汰
+	 * <li>淘汰 -> null <br>
+	 * <br>
+	 * 硬件类资产(状态变为在用时需要选择责任人)：
+	 * <li>在用 -> 在用/备用/维修
+	 * <li>备用 -> 在用/维修/淘汰
+	 * <li>维修 -> 在用/备用/淘汰（转移为在用时默认选中原责任人，如果有的话）
+	 * <li>淘汰 -> 报损
+	 * <li>报损 -> null <br>
+	 * <br>
+	 * 多项资产一起检查时取各项交集，可能为空
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value = "check-state", results = { @Result(type = "json", params = { "root", "nextStates" }) })
+	public String checkState() throws Exception {
+		nextStates = assetService.checkNextStates(splitIds(), type);
+		return SUCCESS;
+	}
+
+	private byte state; // 新资产状态
+	private long owner; // 新资产责任人（硬件类）
+	private boolean keep; // 是否保留原有的责任人（多个资产同时修改时）
+
+	public byte getState() {
+		return state;
+	}
+
+	public void setState(byte state) {
+		this.state = state;
+	}
+
+	public long getOwner() {
+		return owner;
+	}
+
+	public void setOwner(long owner) {
+		this.owner = owner;
+	}
+
+	public boolean isKeep() {
+		return keep;
+	}
+
+	public void setKeep(boolean keep) {
+		this.keep = keep;
+	}
+
+	/**
+	 * 调整资产的使用状态
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value = "change-state", results = { @Result(type = "json", params = { "root", "result" }) })
+	public String changeState() throws Exception {
+		result = assetService.changeState(splitIds(), type, state, owner, keep);
+		return SUCCESS;
+	}
+
+	/**
+	 * 根据校验结果调整硬件类资产数据的调整方式<br>
+	 * 0=调整责任人，1=回收资产，2=根据责任人调整所属公司
+	 */
+	private byte adjustType;
+
+	public byte getAdjustType() {
+		return adjustType;
+	}
+
+	public void setAdjustType(byte adjustType) {
+		this.adjustType = adjustType;
+	}
+
+	/**
+	 * 根据校验结果调整硬件类资产数据的调整方式，每次调整一项，提交id属性<br>
+	 * adjustType: 0=调整责任人(需要提交owner属性); 1=回收资产; 2=根据责任人调整所属公司
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	@Action(value = "adjust", results = { @Result(type = "json", params = { "root", "result" }) })
+	public String adjust() throws Exception {
+		result = assetService.adjust(id, adjustType, owner);
+		return SUCCESS;
+	}
+
+	@Action(value = "new-assets", results = { @Result(type = "json", params = { "root", "result" }) })
+	public String newAsset() throws Exception {
+		result = assetService.createNewAssets(transProps(), getCurrentCompanyId());
+		return SUCCESS;
+	}
+
+	private List<HardwareItem> owned;
+
+	public List<HardwareItem> getOwned() {
+		return owned;
+	}
+
+	public void setOwned(List<HardwareItem> owned) {
+		this.owned = owned;
+	}
+
+	@Action(value = "owned-equipments", results = { @Result(type = "json", params = { "root", "owned" }) })
+	public String ownedEquipments() throws Exception {
+		owned = assetService.loadEquipmentsByOwner(getCurrentEmployee());
+		return SUCCESS;
 	}
 }

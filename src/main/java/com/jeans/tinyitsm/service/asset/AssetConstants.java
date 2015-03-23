@@ -36,11 +36,11 @@ public class AssetConstants {
 	/**
 	 * 资产状态，Asset.state，其中软件类资产只适用IN_USE, IDLE, DISUSE三种状态
 	 */
-	public static final byte IN_USE = 0;
-	public static final byte DISUSE = 1;
-	public static final byte FIXING = 2;
-	public static final byte IDLE = 3;
-	public static final byte ELIMINATED = -1;
+	public static final byte IN_USE = 0;		// 在用
+	public static final byte DISUSE = 1;		// 淘汰
+	public static final byte FIXING = 2;		// 维修
+	public static final byte IDLE = 3;			// 备用
+	public static final byte ELIMINATED = -1;	// 报损
 
 	/**
 	 * 硬件类资产保修状态，Hardware.warranty
@@ -69,6 +69,15 @@ public class AssetConstants {
 	public static final byte IMPORTANT_DEGREE = 1;
 	public static final byte KEY_DEGREE = 2;
 	private static final String[] IMPORTANCE_NAMES = new String[] { "普通", "重要", "关键" };
+
+	/**
+	 * 硬件类资产数据一致性检查错误码，负数为错误，正数为警告
+	 */
+	public static final byte INVALID_OWNER = -3;									// 责任人不存在
+	public static final byte IN_USE_ASSET_OWNED_BY_FORMER_EMPLOYEE = -2;			// 在用资产的责任人已经离职
+	public static final byte INVALID_OWNER_COMPANY = -1;							// 责任人和资产所属公司不一致
+	public static final byte VALIDATE_OK = 0;										// 检验无误
+	public static final byte IN_USE_ASSET_WITHOUT_OWNER = 1;						// 在用资产没有责任人（疑问）
 
 	/**
 	 * 获取资产类型对应的中文名称

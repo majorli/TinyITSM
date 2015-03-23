@@ -303,6 +303,9 @@
 .icon-table-lightning {
 	background: url('ext-icons/table_lightning.png') no-repeat center center;
 }
+.icon-vcard {
+	background: url('ext-icons/vcard.png') no-repeat center center;
+}
 .icon-vcard-add {
 	background: url('ext-icons/vcard_add.png') no-repeat center center;
 }
@@ -311,4 +314,16 @@
 }
 .icon-computer {
 	background: url('ext-icons/computer.png') no-repeat center center;
+}
+.icon-printer {
+	background: url('ext-icons/printer.png') no-repeat center center;
+}
+.icon-phone-sound {
+	background: url('ext-icons/phone_sound.png') no-repeat center center;
+}
+.icon-wrench {
+	background: url('ext-icons/wrench.png') no-repeat center center;
+}
+.icon-wrench-orange {
+	background: url('ext-icons/wrench_orange.png') no-repeat center center;
 }

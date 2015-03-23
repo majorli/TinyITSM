@@ -5,6 +5,9 @@ $(function() {
 	$("#breadcrumbs").html("<a href=\"javascript:window.location.replace('func?code=HOME_PAGE')\">首页</a>&nbsp;&#187;&nbsp;资产管理");
 	var grid = {
 		"init" : function() {
+			$("div#validation").delegate("a._Chown", "click", grid._chown);
+			$("div#validation").delegate("a._SetIdle", "click", grid._setIdle);
+			$("div#validation").delegate("a._Chcmp", "click", grid._chcmp);
 			$("#hardware").datagrid({
 				"fit" : true,
 				"rownumbers" : true,
@@ -223,6 +226,26 @@ $(function() {
 					}
 				} ]
 			});
+			$("#aState").dialog({
+				"buttons" : [ {
+					"text" : "确定",
+					"iconCls" : "icon-saved",
+					"handler" : function() {
+						var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
+						if (tab == 2) {
+							grid.changeOwner();
+						} else {
+							grid.changeState();
+						}
+					}
+				}, {
+					"text" : "取消",
+					"iconCls" : "icon-multiple",
+					"handler" : function() {
+						$("#aState").dialog("close");
+					}
+				} ]
+			});
 		},
 		"loadHardware" : function() {
 			var c = $("#hwCatalog").combobox("getValue");
@@ -300,6 +323,8 @@ $(function() {
 				id.push(n.id);
 			});
 			data.ids = id.join();
+			$("#v_ids").val(data.ids);
+			$("#v_type").val(data.type);
 			$("#aProps").dialog({
 				"title" : "资产属性[已选" + id.length + "项资产]"
 			});
@@ -337,28 +362,9 @@ $(function() {
 		},
 		"sendProps" : function() {
 			var data = {
-				"ids" : "",
-				"type" : 0
+				"ids" : $("#v_ids").val(),
+				"type" : +$("#v_type").val()
 			};
-			var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
-			var sel = [];
-			if (tab == 0) {
-				data.type = 1;
-				sel = $("#hardware").datagrid("getSelections");
-			} else if (tab == 1) {
-				data.type = 3;
-				sel = $("#software").datagrid("getSelections");
-			} else {
-				return;
-			}
-			if (sel.length == 0) {
-				return;
-			}
-			var id = [];
-			$.each(sel, function(i, n) {
-				id.push(n.id);
-			});
-			data.ids = id.join();
 			data["props.name"] = grid._getValue("name");
 			data["props.vendor"] = grid._getValue("vendor");
 			data["props.modelOrVersion"] = grid._getValue("modelOrVersion");
@@ -381,12 +387,14 @@ $(function() {
 				data["props.license"] = grid._getValue("license");
 				data["props.expiredTime"] = grid._getValue("expiredTime");
 			}
+			$.waitbox("正在保存");
 			$.ajax({
 				"url" : "asset/save-props",
 				"data" : data,
 				"success" : function(result) {
+					$.waitbox();
 					$.msgbox("消息", result + "项资产属性修改成功。", "info");
-					if (tab == 0) {
+					if (data.type == 1) {
 						$("#hardware").datagrid("reload");
 					} else {
 						$("#software").datagrid("reload");
@@ -424,6 +432,184 @@ $(function() {
 			// 导出资产为excel
 			$("#exportType").val(type);
 			$("#exportForm").form("submit");
+		},
+		"validate" : function() {
+			$("#tabs").tabs("select", 2);
+			var v = $("<ol id='vali'></ol>");
+			$.waitbox("正在校验");
+			$.ajax({
+				"url" : "asset/asset-vali",
+				"success" : function(validation) {
+					var count = 0;
+					for ( var id in validation) {
+						var l = $(validation[id]);
+						l.prop("id", id);
+						v.append(l);
+						count++;
+					}
+					$("#validation").html("").append("<h4>资产数据校验：共发现" + count + "项资产数据可能存在错误：</h4>").append(v);
+					$.waitbox();
+				}
+			});
+		},
+		"_chown" : function() {
+			// 设置责任人
+			$("#p_state,#p_keep").hide();
+			$("#p_dept,#p_empl").show();
+			$("#v_ids").val($(this).parent().prop("id"));
+			$("#v_dept").combotree("clear");
+			$("#v_empl").combobox("clear");
+			$("#aState").dialog("open");
+		},
+		"changeOwner" : function() {
+			// 调整责任人
+			var data = {
+				"id" : +$("#v_ids").val(),
+				"owner" : +$("#v_empl").combobox("getValue"),
+				"adjustType" : 0
+			};
+			if (data.owner == 0) {
+				$.msgbox("错误", "必须选择一个责任人。", "warning");
+			} else {
+				$.waitbox("正在调整");
+				$.ajax({
+					"url" : "asset/adjust",
+					"data" : data,
+					"success" : function(result) {
+						$.waitbox();
+						if (result == 0) {
+							$.msgbox("错误", "调整责任人失败。", "warning");
+						} else {
+							$.msgbox("消息", "调整责任人完成。", "info");
+						}
+						$("#aState").dialog("close");
+					}
+				});
+			}
+		},
+		"_setIdle" : function() {
+			// 回收设备（状态设置为IDLE，责任人id设置为0）
+			var id = +$(this).parent().prop("id");
+			$.messager.confirm("确认", "确定要将该资产回收为闲置/备用状态吗？", function(r) {
+				if (r) {
+					grid._adjust(id, 1, "资产回收");
+				}
+			});
+		},
+		"_chcmp" : function() {
+			// 调整设备所属公司为责任人所在公司
+			var id = +$(this).parent().prop("id");
+			$.messager.confirm("确认", "确定要将该资产所属公司调整为其责任人所在公司吗？", function(r) {
+				if (r) {
+					grid._adjust(id, 2, "调整所属公司");
+				}
+			});
+		},
+		"_adjust" : function(id, type, msg) {
+			var data = {
+					"id" : id,
+					"adjustType" : type
+				};
+				$.waitbox("正在调整");
+				$.ajax({
+					"url" : "asset/adjust",
+					"data" : data,
+					"success" : function(result) {
+						$.waitbox();
+						if (result == 0) {
+							$.msgbox("错误", msg + "失败。", "warning");
+						} else {
+							$.msgbox("消息", msg + "完成。", "info");
+						}
+					}
+				});
+		},
+		"beginChangeState" : function() {
+			var data = {
+				"ids" : "",
+				"type" : 0
+			};
+			var tab = $("#tabs").tabs("getTabIndex", $("#tabs").tabs("getSelected"));
+			var sel = [];
+			if (tab == 0) {
+				data.type = 1;
+				sel = $("#hardware").datagrid("getSelections");
+				$("#p_state,#p_dept,#p_empl,#p_keep").show();
+			} else if (tab == 1) {
+				data.type = 3;
+				sel = $("#software").datagrid("getSelections");
+				$("#p_state").show();
+				$("#p_dept,#p_empl,#p_keep").hide();
+			} else {
+				return;
+			}
+			if (sel.length == 0) {
+				return;
+			}
+			var id = [];
+			$.each(sel, function(i, n) {
+				id.push(n.id);
+			});
+			data.ids = id.join();
+			$("#v_ids").val(data.ids);
+			$("#v_type").val(data.type);
+			$.ajax({
+				"url" : "asset/check-state",
+				"data" : data,
+				"success" : function(nextStates) {
+					if (nextStates.length == 0) {
+						$.msgbox("错误", "所选的资产没有统一的状态变更方式或已进入最终状态（硬件已报损/软件已淘汰）", "warning");
+					} else {
+						// 生成状态转移对话框
+						var st = [];
+						var stNames = [ "报损", "在用", "淘汰", "维修", "闲置/备用" ];
+						$.each(nextStates, function(i, n) {
+							var t = {};
+							t.id = +n;
+							t.text = stNames[t.id + 1];
+							st.push(t);
+						});
+						$("#v_state").combobox({
+							"data" : st,
+							"value" : +nextStates[0]
+						});
+						$("#v_dept").combotree("clear");
+						$("#v_empl").combobox("clear");
+						$("#v_keep").prop("checked", false);
+						// 打开对话框
+						$("#aState").dialog("open");
+					}
+				}
+			});
+		},
+		"changeState" : function() {
+			var data = {
+				"ids" : $("#v_ids").val(),
+				"type" : +$("#v_type").val(),
+				"state" : +$("#v_state").combobox("getValue"),
+				"owner" : +$("#v_empl").combobox("getValue"),
+				"keep" : $("#v_keep").prop("checked")
+			};
+			if (data.type == 1 && data.state == 0 && data.owner == 0) {
+				// 如果硬件设备状态值是在用，则必须有责任人
+				$.msgbox("错误", "硬件类资产状态为在用时必须选择一个责任人。", "warning");
+			} else {
+				$.waitbox("正在调整");
+				$.ajax({
+					"url" : "asset/change-state",
+					"data" : data,
+					"success" : function(result) {
+						$.waitbox();
+						$.msgbox("消息", result + "项资产状态调整成功。", "info");
+						if (data.type == 1) {
+							$("#hardware").datagrid("reload");
+						} else {
+							$("#software").datagrid("reload");
+						}
+						$("#aState").dialog("close");
+					}
+				});
+			}
 		}
 	};
 
@@ -511,10 +697,22 @@ $(function() {
 		} ],
 		"onSelect" : grid.loadSoftware
 	});
+	$("#appendAsset").on("click", function() {
+		window.location.replace("func?code=AST_NEW");
+	});
 	$("#editProperties").on("click", grid.openProps);
 	$($("#exportAssets").menubutton("options").menu).menu({
 		"onClick" : function(item) {
 			grid.exp(item.id);
+		}
+	});
+	$("#validateAssets").on("click", grid.validate);
+	$("#changeState").on("click", grid.beginChangeState);
+	$("#v_dept").combotree({
+		"onChange" : function(newValue, oldValue) {
+			$("#v_empl").combobox({
+				"url" : "hr/get-children?type=1&id=" + newValue,
+			});
 		}
 	});
 });

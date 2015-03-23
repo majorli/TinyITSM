@@ -1,14 +1,18 @@
 package com.jeans.tinyitsm.service.asset.impl;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +21,11 @@ import com.jeans.tinyitsm.dao.BaseDao;
 import com.jeans.tinyitsm.model.asset.Asset;
 import com.jeans.tinyitsm.model.asset.Hardware;
 import com.jeans.tinyitsm.model.asset.Software;
+import com.jeans.tinyitsm.model.hr.Employee;
 import com.jeans.tinyitsm.model.view.AssetItem;
+import com.jeans.tinyitsm.model.view.AssetValidateResult;
 import com.jeans.tinyitsm.model.view.Grid;
+import com.jeans.tinyitsm.model.view.HRUnit;
 import com.jeans.tinyitsm.model.view.HardwareItem;
 import com.jeans.tinyitsm.model.view.SoftwareItem;
 import com.jeans.tinyitsm.service.asset.AssetConstants;
@@ -183,46 +190,17 @@ public class AssetServiceImpl implements AssetService {
 		}
 		return assetItemsList;
 	}
-	
+
 	@Override
 	@Transactional
 	public Asset newAsset(Map<String, Object> properties, byte type) {
-		Asset asset = Asset.createAsset(type);
-		asset.setCompanyId((long) properties.get("companyId"));
-		asset.setType(type);
-		asset.setCatalog((byte) properties.get("catalog"));
-		asset.setName((String) properties.get("name"));
-		asset.setVendor((String) properties.get("vendor"));
-		asset.setModelOrVersion((String) properties.get("modelOrVersion"));
-		asset.setAssetUsage((String) properties.get("assetUsage"));
-		asset.setPurchaseTime((Date) properties.get("purchaseTime"));
-		int quantity = (int) properties.get("quantity");
-		asset.setQuantity(quantity);
-		asset.setCost((BigDecimal) properties.get("cost"));
-		asset.setState((byte) properties.get("state"));
-		asset.setComment((String) properties.get("comment"));
-		if (asset instanceof Hardware) {
-			((Hardware) asset).setSn((String) properties.get("sn"));
-			((Hardware) asset).setConfiguration((String) properties.get("configuration"));
-			((Hardware) asset).setWarranty((byte) properties.get("warranty"));
-			((Hardware) asset).setLocation((String) properties.get("location"));
-			((Hardware) asset).setIp((String) properties.get("ip"));
-			((Hardware) asset).setImportance((byte) properties.get("importance"));
-			((Hardware) asset).setOwnerId((long) properties.get("ownerId"));
-			String code = (String) properties.get("code");
-			if (quantity > 1) {
-				code += "#1~" + quantity;
+		Asset asset = Asset.createAsset(properties, (long) properties.get("companyId"), type);
+		if (null != asset) {
+			if (asset instanceof Hardware) {
+				hwDao.save((Hardware) asset);
+			} else if (asset instanceof Software) {
+				swDao.save((Software) asset);
 			}
-			((Hardware) asset).setCode(code);
-			((Hardware) asset).setFinancialCode((String) properties.get("financialCode"));
-			hwDao.save((Hardware) asset);
-		} else if (asset instanceof Software) {
-			((Software) asset).setSoftwareType((byte) properties.get("softwareType"));
-			((Software) asset).setLicense((String) properties.get("license"));
-			((Software) asset).setExpiredTime((Date) properties.get("expiredTime"));
-			swDao.save((Software) asset);
-		} else {
-			asDao.save(asset);
 		}
 		return asset;
 	}
@@ -373,5 +351,267 @@ public class AssetServiceImpl implements AssetService {
 			}
 			return count;
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<AssetValidateResult> validate(long companyId) {
+		List<AssetValidateResult> results = new ArrayList<AssetValidateResult>();
+
+		String hql = "from Hardware where companyId = " + companyId;
+		List<Hardware> assets = hwDao.find(hql);
+		for (Hardware hardware : assets) {
+			if (hardware.getOwnerId() == 0) {
+				// 无责任人
+				if (hardware.getState() == AssetConstants.IN_USE) {
+					// 在用设备无责任人
+					results.add(new AssetValidateResult(AssetConstants.IN_USE_ASSET_WITHOUT_OWNER, hardware.getId(), AssetConstants
+							.getAssetCatalogName(hardware.getCatalog()), hardware.getFullName(), null, null));
+				}
+			} else {
+				// 有责任人
+				Employee owner = hrService.getEmployee(hardware.getOwnerId());
+				if (null == owner) {
+					// 责任人不存在
+					results.add(new AssetValidateResult(AssetConstants.INVALID_OWNER, hardware.getId(), AssetConstants.getAssetCatalogName(hardware
+							.getCatalog()), hardware.getFullName(), null, null));
+				} else {
+					if (owner.getDepartment().getSubRoot().getId() != hardware.getCompanyId()) {
+						// 责任人和资产所属公司不一致
+						results.add(new AssetValidateResult(AssetConstants.INVALID_OWNER_COMPANY, hardware.getId(), AssetConstants.getAssetCatalogName(hardware
+								.getCatalog()), hardware.getFullName(), owner.getName(), owner.getDepartment().getSubRoot().getAlias()));
+					} else {
+						if (owner.getState() == HRConstants.FORMER && hardware.getState() == AssetConstants.IN_USE) {
+							// 在用设备的责任人已经离职
+							results.add(new AssetValidateResult(AssetConstants.IN_USE_ASSET_OWNED_BY_FORMER_EMPLOYEE, hardware.getId(), AssetConstants
+									.getAssetCatalogName(hardware.getCatalog()), hardware.getFullName(), owner.getName(), owner.getDepartment().getSubRoot()
+									.getAlias()));
+						}
+					}
+				}
+			}
+		}
+		return results;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Set<Byte> checkNextStates(Set<Long> ids, byte type) {
+		Set<Byte> states = new HashSet<Byte>();
+		if (ids.size() == 0) {
+			return states;
+		}
+
+		states.add(AssetConstants.IN_USE);
+		states.add(AssetConstants.IDLE);
+		states.add(AssetConstants.DISUSE);
+		if (type == AssetConstants.HARDWARE_ASSET) {
+			states.add(AssetConstants.FIXING);
+			states.add(AssetConstants.ELIMINATED);
+		}
+
+		// 状态转移表
+		Set<Byte> n_h_iu = new HashSet<Byte>();
+		Set<Byte> n_h_id = new HashSet<Byte>();
+		Set<Byte> n_h_fx = new HashSet<Byte>();
+		Set<Byte> n_h_du = new HashSet<Byte>();
+		Set<Byte> n_s_iu = new HashSet<Byte>();
+		Set<Byte> n_s_id = new HashSet<Byte>();
+
+		n_h_iu.add(AssetConstants.IN_USE);
+		n_h_iu.add(AssetConstants.IDLE);
+		n_h_iu.add(AssetConstants.FIXING);
+
+		n_h_id.add(AssetConstants.IN_USE);
+		n_h_id.add(AssetConstants.FIXING);
+		n_h_id.add(AssetConstants.DISUSE);
+
+		n_h_fx.add(AssetConstants.IN_USE);
+		n_h_fx.add(AssetConstants.IDLE);
+		n_h_fx.add(AssetConstants.DISUSE);
+
+		n_h_du.add(AssetConstants.ELIMINATED);
+
+		n_s_iu.add(AssetConstants.IDLE);
+		n_s_iu.add(AssetConstants.DISUSE);
+
+		n_s_id.add(AssetConstants.IN_USE);
+		n_s_id.add(AssetConstants.DISUSE);
+
+		List<Asset> assets = loadAssets(ids, type);
+		if (type == AssetConstants.HARDWARE_ASSET) {
+			/*
+			 * 硬件类资产(状态变为在用时需要选择责任人)：
+			 * 在用 -> 在用/备用/维修
+			 * 备用 -> 在用/维修/淘汰
+			 * 维修 -> 在用/备用/淘汰（转移为在用时默认选中原责任人，如果有的话）
+			 * 淘汰 -> 报损
+			 * 报损 -> null
+			 */
+			for (Asset asset : assets) {
+				byte oldState = asset.getState();
+				if (oldState == AssetConstants.ELIMINATED) {
+					// 剪枝：无论什么时候遇到原状态为报损的，直接将结果集清空并跳出循环
+					states.clear();
+					break;
+				} else {
+					if (states.size() == 0) {
+						// 剪枝：已经没有下一种可能状态了，直接跳出循环
+						break;
+					} else {
+						switch (oldState) {
+						case AssetConstants.IN_USE:
+							states.retainAll(n_h_iu);
+							break;
+						case AssetConstants.IDLE:
+							states.retainAll(n_h_id);
+							break;
+						case AssetConstants.FIXING:
+							states.retainAll(n_h_fx);
+							break;
+						case AssetConstants.DISUSE:
+							states.retainAll(n_h_du);
+						}
+					}
+				}
+			}
+		} else {
+			/*
+			 * 软件类资产：
+			 * 在用 -> 备用/淘汰
+			 * 备用 -> 在用/淘汰
+			 * 淘汰 -> null
+			 */
+			for (Asset asset : assets) {
+				byte oldState = asset.getState();
+				if (oldState == AssetConstants.DISUSE) {
+					// 剪枝：无论什么时候遇到原状态为淘汰的，直接将结果集清空并跳出循环
+					states.clear();
+					break;
+				} else {
+					if (states.size() == 1) {
+						// 剪枝：已经只剩下淘汰一种可能了，后续的资产如果不是出现原状态为淘汰的就不会再对结果有任何影响了，所以无需再做交集，直接跳到下一项资产
+						continue;
+					} else {
+						if (oldState == AssetConstants.IN_USE) {
+							states.retainAll(n_s_iu);
+						} else {
+							states.retainAll(n_s_id);
+						}
+					}
+				}
+			}
+		}
+		return states;
+	}
+
+	/**
+	 * 硬件类资产如果新状态为0(IN_USE)，则需要同时设置ownerId，如果keepOldOwner == true则原来ownerId != 0的保持不变<br>
+	 * 硬件类资产如果新状态不为0,则设置ownerId为0，如果keepOldOwner == true则原来ownerId != 0的保持不变<br>
+	 * 软件类资产直接变更新状态即可
+	 */
+	@Override
+	@Transactional
+	public int changeState(Set<Long> ids, byte type, byte newState, long ownerId, boolean keepOldOwner) {
+		int count = 0;
+		if (ids.size() > 0) {
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("p_newState", newState);
+			params.put("p_ids", ids);
+			if (type == AssetConstants.SOFTWARE_ASSET) {
+				String hql = "update Software set state = :p_newState where id in (:p_ids)";
+				count = swDao.executeHql(hql, params);
+			} else if (type == AssetConstants.HARDWARE_ASSET) {
+				long newOwnerId = (newState == AssetConstants.IN_USE) ? ownerId : 0;
+				if (keepOldOwner) {
+					// 保留原有的ownerId
+					String hql = "update Hardware set state = :p_newState where id in (:p_ids) and ownerId <> 0";
+					count += hwDao.executeHql(hql, params);
+					hql = "update Hardware set state = :p_newState, ownerId = :p_newOwnerId where id in (:p_ids) and ownerId = 0";
+					params.put("p_newOwnerId", newOwnerId);
+					count += hwDao.executeHql(hql, params);
+				} else {
+					String hql = "update Hardware set state = :p_newState, ownerId = :p_newOwnerId where id in (:p_ids)";
+					params.put("p_newOwnerId", newOwnerId);
+					count = hwDao.executeHql(hql, params);
+				}
+			}
+		}
+		return count;
+	}
+
+	@Override
+	@Transactional
+	public int adjust(long id, byte adjustType, long ownerId) {
+		int count = 0;
+		if (id > 0) {
+			switch (adjustType) {
+			case 0: // 调整责任人
+				count = hwDao.executeHql("update Hardware set ownerId = " + ownerId + " where id = " + id);
+				break;
+			case 1: // 回收资产（状态设置为IDLE，责任人id设置为0）
+				count = hwDao.executeHql("update Hardware set state = 3, ownerId = 0 where id = " + id);
+				break;
+			case 2: // 根据责任人调整所属公司
+				Hardware asset = hwDao.getById(Hardware.class, id);
+				Employee owner = hrService.getEmployee(asset.getOwnerId());
+				if (null != owner) {
+					count = hwDao.executeHql("update Hardware set companyId = " + owner.getDepartment().getSubRoot().getId() + " where id = " + id);
+				}
+			}
+		}
+		return count;
+	}
+
+	@Override
+	@Transactional
+	public int createNewAssets(Map<String, Object> props, long companyId) {
+		byte type = (byte) props.get("type");
+		int number = (int) props.get("number");
+		Asset prototype = Asset.createAsset(props, companyId, type);
+		Set<Serializable> ids = new HashSet<Serializable>();
+		if (null != prototype) {
+			if (number > 1) {
+				if (prototype instanceof Hardware) {
+					DecimalFormat df = new DecimalFormat("000");
+					String prototypeCode = ((Hardware) prototype).getCode();
+					for (int n = 1; n <= number; n++) {
+						Hardware hw = new Hardware();
+						BeanUtils.copyProperties(prototype, hw);
+						hw.setCode(prototypeCode + "[" + df.format(n) + "]");
+						ids.add(hwDao.save(hw));
+					}
+				} else {
+					while (number-- > 0) {
+						Software sw = new Software();
+						BeanUtils.copyProperties(prototype, sw);
+						ids.add(swDao.save(sw));
+					}
+				}
+			} else {
+				if (type == AssetConstants.HARDWARE_ASSET) {
+					ids.add(hwDao.save((Hardware) prototype));
+				} else {
+					ids.add(swDao.save((Software) prototype));
+				}
+			}
+			ids.remove(null);
+		}
+		return ids.size();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<HardwareItem> loadEquipmentsByOwner(HRUnit owner) {
+		List<HardwareItem> list = new ArrayList<HardwareItem>();
+		if (null != owner) {
+			List<Hardware> assets = new ArrayList<Hardware>();
+			String hql = "from Hardware where ownerId = " + owner.getId() + " order by catalog, code, id";
+			assets.addAll(hwDao.find(hql));
+			for (Hardware asset : assets) {
+				list.add(HardwareItem.createInstance(asset, hrService.getUnit(asset.getCompanyId(), HRConstants.COMPANY), owner));
+			}
+		}
+		return list;
 	}
 }

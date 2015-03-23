@@ -150,4 +150,9 @@ public class TinyHRAction extends BaseAction<List<HRUnit>> {
 		return SUCCESS;
 	}
 
+	@Action(value = "get-curr-depts", results = { @Result(type = "json", params = { "root", "data" }) })
+	public String getDepartments() throws Exception {
+		data = hrService.getOrgTree(getCurrentCompanyId(), OrgTreeType.DepartmentsTree, false);
+		return SUCCESS;
+	}
 }
