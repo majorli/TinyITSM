@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -33,7 +34,7 @@ public class NotificationServiceImpl implements NotificationService {
 	@Override
 	@Transactional
 	public Notification publish(byte source, String text, long companyId) {
-		if (companyId <= 0 || StringUtils.isBlank(text) || source <= 0 || source > 8)
+		if (companyId <= 0 || StringUtils.isBlank(text) || source < 0 || source > 8)
 			return null;
 		Notification noti = new Notification();
 		noti.setText(StringUtils.trim(text));
@@ -42,6 +43,21 @@ public class NotificationServiceImpl implements NotificationService {
 		noti.setPublishTime(new Date());
 		notiDao.save(noti);
 
+		return noti;
+	}
+
+	@Override
+	@Transactional
+	public List<Notification> publish(byte source, String text, Set<Long> companyIds) {
+		List<Notification> noti = new ArrayList<Notification>();
+		if (!companyIds.isEmpty()) {
+			for (long companyId : companyIds) {
+				Notification n = publish(source, text, companyId);
+				if (null != n) {
+					noti.add(n);
+				}
+			}
+		}
 		return noti;
 	}
 
@@ -82,7 +98,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 	@Override
 	@Transactional
-	public List<Notification> publish(Event<?> e, List<Long> companyIds) {
+	public List<Notification> publish(Event<?> e, Set<Long> companyIds) {
 		List<Notification> noti = new ArrayList<Notification>();
 		for (long id : companyIds) {
 			Notification n = new Notification();

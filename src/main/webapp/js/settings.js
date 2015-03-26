@@ -324,4 +324,29 @@ $(function() {
 			}
 		});
 	});
+	/**
+	 * 管理员发布公告
+	 */
+	$("#adminNoti").on("click", function() {
+		if ($("#adminNotiScope").combotree("isValid") && $("#adminNotiText").textbox("isValid")) {
+			$.waitbox("正在发布");
+			$.ajax({
+				"url" : "portal/pub-admin-noti",
+				"data" : {
+					"ids" : $("#adminNotiScope").combotree("getValues").join(),
+					"text" : $("#adminNotiText").textbox("getText")
+				},
+				"success" : function(result) {
+					$.waitbox();
+					if (result > 0) {
+						$.msgbox("消息", result + "条管理员公告发布成功", "info");
+						$("#adminNotiScope").combotree("clear");
+						$("#adminNotiText").textbox("clear");
+					} else {
+						$.msgbox("错误", "管理员公告发布失败，请稍后再试", "warning");
+					}
+				}
+			});
+		}
+	});
 });

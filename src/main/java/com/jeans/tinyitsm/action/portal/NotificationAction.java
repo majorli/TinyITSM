@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jeans.tinyitsm.action.BaseAction;
 import com.jeans.tinyitsm.model.portal.Notification;
+import com.jeans.tinyitsm.service.portal.MessageConstants;
 import com.jeans.tinyitsm.service.portal.NotificationService;
 import com.jeans.tinyitsm.service.portal.SubscriptionService;
 import com.jeans.tinyitsm.service.portal.TaskService;
@@ -60,6 +61,31 @@ public class NotificationAction extends BaseAction<List<Notification>> {
 		long newRss = subsService.checkNews(getCurrentUserId());
 		long newTasks = taskService.checkNews(getCurrentUserId());
 		tip = "系统公告 [你有：" + newTasks + "项待办任务，" + newRss + "条新订阅动态]";
+		return SUCCESS;
+	}
+
+	private int result;
+	private String text;
+
+	public int getResult() {
+		return result;
+	}
+
+	public void setResult(int result) {
+		this.result = result;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	@Action(value = "pub-admin-noti", results = { @Result(type = "json", params = { "root", "result" }) })
+	public String adminNoti() throws Exception {
+		result = notiService.publish(MessageConstants.ADMIN, text, splitIds()).size();
 		return SUCCESS;
 	}
 }

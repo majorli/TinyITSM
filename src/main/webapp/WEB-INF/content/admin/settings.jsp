@@ -97,6 +97,14 @@
 				2）如果确定原有的索引表已经完全损坏，请系统管理员从文件系统中彻底删除索引表根目录后再重新初始化。
 				</p>
 				<a id="reIndex" class="easyui-linkbutton" data-options="iconCls:'icon-settings'" style="padding:2px 8px;">初始化索引表</a>
+				<h4>发布管理员公告</h4>
+				<p style="color:red">注意：管理员公告的可见范围为本公司及下属公司，但不能向上级公司或平级公司发布管理员公告。
+				</p>
+				<div class="Line">
+					<label>公告范围：<input id="adminNotiScope" class="easyui-combotree" data-options="valueField:'id',textField:'text',url:'hr/get-companies',prompt:'请选择公告可见范围',cascadeCheck:false,required:true,missingMessage:'必须至少选择一家公司',height:30,width:200" multiple="multiple" /></label>
+					<label>公告内容：<input type="text" id="adminNotiText" class="easyui-textbox" data-options="validType:'length[5,255]',required:true,missingMessage:'公告内容必须输入',prompt:'请输入公告内容，长度5至255个字',height:30,width:500" /></label>
+					<a id="adminNoti" class="easyui-linkbutton" data-options="iconCls:'icon-saved'" style="padding: 2px 8px;">发布</a>
+				</div>
 				<div style="height:1em;"></div>
 			</div>
 		</div>

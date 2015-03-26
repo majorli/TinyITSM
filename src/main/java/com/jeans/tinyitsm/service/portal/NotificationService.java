@@ -1,6 +1,7 @@
 package com.jeans.tinyitsm.service.portal;
 
 import java.util.List;
+import java.util.Set;
 
 import com.jeans.tinyitsm.event.HREvent;
 import com.jeans.tinyitsm.event.itsm.Event;
@@ -21,6 +22,19 @@ public interface NotificationService {
 	public Notification publish(byte source, String text, long companyId);
 
 	/**
+	 * 根据提供的字段值生成一到多个系统公告
+	 * 
+	 * @param source
+	 *            MessageConstants类定义的公告来源常量
+	 * @param text
+	 *            公告正文，255个字
+	 * @param companyIds
+	 *            公告的可见范围
+	 * @return
+	 */
+	public List<Notification> publish(byte source, String text, Set<Long> companyIds);
+
+	/**
 	 * 根据TinyHR事件生成公告
 	 * 
 	 * @param e
@@ -35,7 +49,7 @@ public interface NotificationService {
 	 * @param e
 	 * @return
 	 */
-	public List<Notification> publish(Event<?> e, List<Long> companyIds);
+	public List<Notification> publish(Event<?> e, Set<Long> companyIds);
 
 	/**
 	 * 加载最新的系统公告，直到toId的前一条，如果toId <= 0，加载最新的rows条，默认20条

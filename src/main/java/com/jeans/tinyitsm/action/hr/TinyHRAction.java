@@ -75,11 +75,11 @@ public class TinyHRAction extends BaseAction<List<HRUnit>> {
 	public void setCount(int count) {
 		this.count = count;
 	}
-	
+
 	public List<HRUnit> getUpdates() {
 		return updates;
 	}
-	
+
 	public void setUpdates(List<HRUnit> updates) {
 		this.updates = updates;
 	}
@@ -141,7 +141,7 @@ public class TinyHRAction extends BaseAction<List<HRUnit>> {
 	@Action(value = "get-targets", results = { @Result(type = "json", params = { "root", "data" }) })
 	public String moveTarget() throws Exception {
 		if (id == 0) {
-			/* 获取浙江烟草商业专卖系统完整的省市县三级公司树*/
+			/* 获取浙江烟草商业专卖系统完整的省市县三级公司树 */
 			data = hrService.getOrgTree(1L, OrgTreeType.BranchesTree, true);
 		} else {
 			/* 获取公司id下面的部门树 */
@@ -153,6 +153,12 @@ public class TinyHRAction extends BaseAction<List<HRUnit>> {
 	@Action(value = "get-curr-depts", results = { @Result(type = "json", params = { "root", "data" }) })
 	public String getDepartments() throws Exception {
 		data = hrService.getOrgTree(getCurrentCompanyId(), OrgTreeType.DepartmentsTree, false);
+		return SUCCESS;
+	}
+
+	@Action(value = "get-companies", results = { @Result(type = "json", params = { "root", "data" }) })
+	public String getCompanies() throws Exception {
+		data = hrService.getOrgTree(getCurrentCompanyId(), OrgTreeType.BranchesTree, true);
 		return SUCCESS;
 	}
 }

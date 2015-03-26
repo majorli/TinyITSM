@@ -14,6 +14,9 @@ public class PortalConstants {
 	 */
 	public static final int FTS_ASSET_HARDWARE = 201;
 	public static final int FTS_ASSET_SOFTWARE = 202;
+	public static final int FTS_PROJECT_PROJECT = 301;
+	public static final int FTS_PROJECT_ISSUES = 302;
+	public static final int FTS_PROJECT_WIKI = 303;
 	public static final int FTS_CLOUD_FILE = 501;
 	public static final int FTS_CLOUD_LIST = 502;
 }
