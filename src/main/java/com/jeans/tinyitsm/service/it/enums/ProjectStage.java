@@ -32,7 +32,7 @@ public enum ProjectStage implements EnumTitle {
 			title = "项目推广";
 			break;
 		case Constructed:
-			title = "项目竣工";
+			title = "验收竣工";
 		}
 		return title;
 	}

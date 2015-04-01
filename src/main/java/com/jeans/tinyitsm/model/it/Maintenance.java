@@ -6,8 +6,6 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,28 +19,17 @@ import javax.persistence.Table;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
-import com.jeans.tinyitsm.service.it.enums.ProjectStage;
-import com.jeans.tinyitsm.service.it.enums.ProjectType;
-
-/**
- * 信息化项目实体类
- * 
- * @author Majorli
- *
- */
 @Entity
-@Table(name = "projects")
+@Table(name = "maintenance")
 @Indexed
-public class Project implements Serializable {
+public class Maintenance implements Serializable {
+
 	private long id;
 	private String name;
 	private Set<System> systems = new HashSet<System>();
-	private ProjectType type;
-	private ProjectStage stage;
-	private String constructor;
+	private String provider;
 	private Repository repository;
-	private Team projectTeam;
-	private ProjectPlan plan;
+	private Team maintainTeam;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,7 +51,7 @@ public class Project implements Serializable {
 		this.name = name;
 	}
 
-	@OneToMany(mappedBy = "project")
+	@OneToMany(mappedBy = "maintenance")
 	public Set<System> getSystems() {
 		return systems;
 	}
@@ -83,38 +70,18 @@ public class Project implements Serializable {
 		this.systems.remove(system);
 	}
 
-	@Enumerated(EnumType.ORDINAL)
-	@Column(nullable = false)
-	public ProjectType getType() {
-		return type;
-	}
-
-	public void setType(ProjectType type) {
-		this.type = type;
-	}
-
-	@Enumerated(EnumType.ORDINAL)
-	@Column(nullable = false)
-	public ProjectStage getStage() {
-		return stage;
-	}
-
-	public void setStage(ProjectStage stage) {
-		this.stage = stage;
-	}
-
 	@Column(nullable = false, length = 64)
 	@Field
-	public String getConstructor() {
-		return constructor;
+	public String getProvider() {
+		return provider;
 	}
 
-	public void setConstructor(String constructor) {
-		this.constructor = constructor;
+	public void setProvider(String provider) {
+		this.provider = provider;
 	}
 
 	@OneToOne
-	@JoinColumn(nullable = false, name = "repo_id", foreignKey = @ForeignKey(name = "FK_PRJ_REPO"), unique = true)
+	@JoinColumn(nullable = false, name = "repo_id", foreignKey = @ForeignKey(name = "FK_MTN_REPO"), unique = true)
 	public Repository getRepository() {
 		return repository;
 	}
@@ -124,34 +91,22 @@ public class Project implements Serializable {
 	}
 
 	@ManyToOne
-	@JoinColumn(nullable = false, name = "team_id", foreignKey = @ForeignKey(name = "FK_PRJ_TEAM"))
-	public Team getProjectTeam() {
-		return projectTeam;
+	@JoinColumn(nullable = false, name = "team_id", foreignKey = @ForeignKey(name = "FK_MTN_TEAM"))
+	public Team getMaintainTeam() {
+		return maintainTeam;
 	}
 
-	public void setProjectTeam(Team projectTeam) {
-		this.projectTeam = projectTeam;
-	}
-
-	@OneToOne
-	@JoinColumn(name = "plan_id", foreignKey = @ForeignKey(name = "FK_PRJ_PLAN"))
-	public ProjectPlan getPlan() {
-		return plan;
-	}
-
-	public void setPlan(ProjectPlan plan) {
-		this.plan = plan;
+	public void setMaintainTeam(Team maintainTeam) {
+		this.maintainTeam = maintainTeam;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((constructor == null) ? 0 : constructor.hashCode());
 		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((stage == null) ? 0 : stage.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
+		result = prime * result + ((provider == null) ? 0 : provider.hashCode());
 		return result;
 	}
 
@@ -163,12 +118,7 @@ public class Project implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Project other = (Project) obj;
-		if (constructor == null) {
-			if (other.constructor != null)
-				return false;
-		} else if (!constructor.equals(other.constructor))
-			return false;
+		Maintenance other = (Maintenance) obj;
 		if (id != other.id)
 			return false;
 		if (name == null) {
@@ -176,9 +126,10 @@ public class Project implements Serializable {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (stage != other.stage)
-			return false;
-		if (type != other.type)
+		if (provider == null) {
+			if (other.provider != null)
+				return false;
+		} else if (!provider.equals(other.provider))
 			return false;
 		return true;
 	}
@@ -186,8 +137,7 @@ public class Project implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Project [id=").append(id).append(", name=").append(name).append(", type=").append(type).append(", stage=").append(stage)
-				.append(", constructor=").append(constructor).append("]");
+		builder.append("Maintenance [id=").append(id).append(", name=").append(name).append(", provider=").append(provider).append("]");
 		return builder.toString();
 	}
 }

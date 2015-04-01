@@ -6,14 +6,10 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -21,16 +17,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.jeans.tinyitsm.model.hr.Employee;
-import com.jeans.tinyitsm.service.it.enums.TeamType;
 
 @Entity
 @Table(name = "teams")
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Team implements Serializable {
 
 	private long id;
 	private String name;
-	private TeamType type;
 	private Set<Employee> staff = new HashSet<Employee>();
 	private Employee leader;
 
@@ -53,16 +46,6 @@ public class Team implements Serializable {
 		this.name = name;
 	}
 
-	@Enumerated(EnumType.ORDINAL)
-	@Column(nullable = false)
-	public TeamType getType() {
-		return type;
-	}
-
-	public void setType(TeamType type) {
-		this.type = type;
-	}
-
 	@ManyToMany
 	@JoinTable(name = "teams_staff", joinColumns = { @JoinColumn(nullable = false, name = "team_id", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(nullable = false, name = "empl_id", referencedColumnName = "id") })
 	public Set<Employee> getStaff() {
@@ -74,7 +57,9 @@ public class Team implements Serializable {
 	}
 
 	public void addStaff(Employee employee) {
-		this.staff.add(employee);
+		if (null != employee) {
+			this.staff.add(employee);
+		}
 	}
 
 	public void removeStaff(Employee employee) {
@@ -102,8 +87,6 @@ public class Team implements Serializable {
 		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result + ((leader == null) ? 0 : leader.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((staff == null) ? 0 : staff.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
@@ -127,13 +110,6 @@ public class Team implements Serializable {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
-			return false;
-		if (staff == null) {
-			if (other.staff != null)
-				return false;
-		} else if (!staff.equals(other.staff))
-			return false;
-		if (type != other.type)
 			return false;
 		return true;
 	}

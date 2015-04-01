@@ -8,23 +8,22 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
-
 @Entity
-@Table(name = "issue_replies")
+@Table(name = "wiki_replies")
 @PrimaryKeyJoinColumn(name = "id")
-public class IssueReply extends Post {
+public class Reply extends Post {
 
-	private Issue issue;
+	private Page page;
 	private int listOrder;
 
 	@ManyToOne
-	@JoinColumn(nullable = false, name = "issue_id", foreignKey = @ForeignKey(name = "FK_ISSUE_REPLY"))
-	public Issue getIssue() {
-		return issue;
+	@JoinColumn(nullable = false, name = "page_id", foreignKey = @ForeignKey(name = "FK_PAGE_REPLY"))
+	public Page getPage() {
+		return page;
 	}
 
-	public void setIssue(Issue issue) {
-		this.issue = issue;
+	public void setPage(Page page) {
+		this.page = page;
 	}
 
 	@Column(nullable = false, name = "list_order")
@@ -37,18 +36,11 @@ public class IssueReply extends Post {
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("IssueReply [issue=").append(issue.getTitle()).append(", listOrder=").append(listOrder).append("]");
-		return builder.toString();
-	}
-
-	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((issue == null) ? 0 : issue.hashCode());
 		result = prime * result + listOrder;
+		result = prime * result + ((page == null) ? 0 : page.hashCode());
 		return result;
 	}
 
@@ -60,14 +52,21 @@ public class IssueReply extends Post {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		IssueReply other = (IssueReply) obj;
-		if (issue == null) {
-			if (other.issue != null)
-				return false;
-		} else if (!issue.equals(other.issue))
-			return false;
+		Reply other = (Reply) obj;
 		if (listOrder != other.listOrder)
 			return false;
+		if (page == null) {
+			if (other.page != null)
+				return false;
+		} else if (!page.equals(other.page))
+			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Reply [page=").append(page.getTitle()).append(", listOrder=").append(listOrder).append("]");
+		return builder.toString();
 	}
 }
