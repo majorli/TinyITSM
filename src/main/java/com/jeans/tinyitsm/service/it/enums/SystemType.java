@@ -1,5 +1,7 @@
 package com.jeans.tinyitsm.service.it.enums;
 
+import com.jeans.tinyitsm.service.EnumTitle;
+
 public enum SystemType implements EnumTitle {
 	Infrastructure, Network, Security, DataCenter, Cloud, HardwarePlatform, SoftwarePlatform, DataMining, MobileApplication, BusinessApplication, Manufacturing, Tools, Desktop, Others;
 

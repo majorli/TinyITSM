@@ -1,5 +1,7 @@
 package com.jeans.tinyitsm.service.it.enums;
 
+import com.jeans.tinyitsm.service.EnumTitle;
+
 public enum ProjectStage implements EnumTitle {
 	Analyzing, OutlineDesigning, Purchasing, DetailDesigning, Developing, Implementing, Trying, Deploying, Constructed;
 

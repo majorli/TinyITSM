@@ -14,15 +14,19 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
 import com.jeans.tinyitsm.model.hr.Organization;
 import com.jeans.tinyitsm.service.hr.HRConstants;
+import com.jeans.tinyitsm.service.it.enums.SystemDeploy;
 import com.jeans.tinyitsm.service.it.enums.SystemScope;
 import com.jeans.tinyitsm.service.it.enums.SystemStage;
 import com.jeans.tinyitsm.service.it.enums.SystemType;
@@ -44,7 +48,8 @@ public class System implements Serializable {
 	private String provider;
 	private Organization owner;
 	private SystemScope scope;
-	private SystemScope deploy;
+	private Set<Organization> companiesInScope;
+	private SystemDeploy deploy;
 	private Date constructedTime;
 	private Date abandonedTime;
 	private int freeMaintainMonths;
@@ -172,20 +177,34 @@ public class System implements Serializable {
 		this.scope = scope;
 	}
 
+	@ManyToMany
+	@JoinTable(name = "systems_companies_scope", joinColumns = { @JoinColumn(nullable = false, name = "system_id", referencedColumnName = "id") }, inverseJoinColumns = { @JoinColumn(nullable = false, name = "comp_id", referencedColumnName = "id") })
+	public Set<Organization> getCompaniesInScope() {
+		return companiesInScope;
+	}
+
+	public void setCompaniesInScope(Set<Organization> companiesInScope) {
+		this.companiesInScope = companiesInScope;
+	}
+
+	public void addCompanyIntoScope(Organization company) {
+		if (null != company && company.getType() == HRConstants.COMPANY) {
+			this.companiesInScope.add(company);
+		}
+	}
+
+	public void removeCompanyFromScope(Organization company) {
+		this.companiesInScope.remove(company);
+	}
+
 	@Enumerated(EnumType.ORDINAL)
 	@Column(nullable = false)
-	public SystemScope getDeploy() {
+	public SystemDeploy getDeploy() {
 		return deploy;
 	}
 
-	public void setDeploy(SystemScope deploy) {
-		if (deploy == SystemScope.Inferiors) {
-			this.deploy = SystemScope.DirectInferiors;
-		} else if (deploy == SystemScope.PrivateAndInferiors) {
-			this.deploy = SystemScope.PrivateAndDirectInferiors;
-		} else {
-			this.deploy = deploy;
-		}
+	public void setDeploy(SystemDeploy deploy) {
+		this.deploy = deploy;
 	}
 
 	@Column(nullable = true, name = "constructed_time")
@@ -269,6 +288,7 @@ public class System implements Serializable {
 		this.wiki = wiki;
 	}
 
+	@Transient
 	public SystemStage getStage() {
 		if (null == this.constructedTime) {
 			return SystemStage.Constructing;

@@ -1,6 +1,7 @@
 package com.jeans.tinyitsm.service.it.enums;
 
 import com.jeans.tinyitsm.model.hr.Organization;
+import com.jeans.tinyitsm.service.EnumTitle;
 import com.jeans.tinyitsm.service.hr.HRConstants;
 import com.jeans.tinyitsm.util.HrUtil;
 

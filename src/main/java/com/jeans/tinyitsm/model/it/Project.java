@@ -134,7 +134,7 @@ public class Project implements Serializable {
 	}
 
 	@OneToOne
-	@JoinColumn(name = "plan_id", foreignKey = @ForeignKey(name = "FK_PRJ_PLAN"))
+	@JoinColumn(nullable = true, name = "plan_id", foreignKey = @ForeignKey(name = "FK_PRJ_PLAN"), unique = true)
 	public ProjectPlan getPlan() {
 		return plan;
 	}

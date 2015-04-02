@@ -1,5 +1,7 @@
 package com.jeans.tinyitsm.service.it.enums;
 
+import com.jeans.tinyitsm.service.EnumTitle;
+
 public enum PageType implements EnumTitle {
 	Generic, Bug, Requirement, Issue, Discussion, Tutorial;
 

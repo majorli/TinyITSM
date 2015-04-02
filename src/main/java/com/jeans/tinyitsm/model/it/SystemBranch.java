@@ -17,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.jeans.tinyitsm.model.asset.Asset;
 import com.jeans.tinyitsm.model.hr.Employee;
@@ -123,6 +124,7 @@ public class SystemBranch implements Serializable {
 		this.abandonedTime = abandonedTime;
 	}
 
+	@Transient
 	public SystemStage getStage() {
 		if (null == this.constructedTime) {
 			return SystemStage.Constructing;

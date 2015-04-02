@@ -1,5 +1,7 @@
 package com.jeans.tinyitsm.service.it.enums;
 
+import com.jeans.tinyitsm.service.EnumTitle;
+
 public enum SystemStage implements EnumTitle {
 	Constructing, Operating, Abandoned;
 

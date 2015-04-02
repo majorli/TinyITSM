@@ -1,4 +1,4 @@
-package com.jeans.tinyitsm.service.it.enums;
+package com.jeans.tinyitsm.service;
 
 public interface EnumTitle {
 	/**

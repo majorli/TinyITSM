@@ -72,7 +72,7 @@ public class Post implements Serializable {
 	}
 
 	@Lob
-	@Column(columnDefinition = "CLOB", nullable = false)
+	@Column(columnDefinition = "TEXT", nullable = false)
 	@Field
 	public String getText() {
 		return text;
