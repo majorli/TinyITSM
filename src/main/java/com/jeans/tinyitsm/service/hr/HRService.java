@@ -3,6 +3,7 @@ package com.jeans.tinyitsm.service.hr;
 import java.util.List;
 
 import com.jeans.tinyitsm.model.hr.Employee;
+import com.jeans.tinyitsm.model.hr.Organization;
 import com.jeans.tinyitsm.model.view.HRUnit;
 
 /**
@@ -177,8 +178,27 @@ public interface HRService {
 	/**
 	 * 获取指定员工的实际对象
 	 * 
-	 * @param id 员工id
+	 * @param id
+	 *            员工id
 	 * @return
 	 */
 	public Employee getEmployee(long id);
+
+	/**
+	 * 获取指定公司的实际对象
+	 * 
+	 * @param id
+	 *            公司id
+	 * @return
+	 */
+	public Organization getCompany(long id);
+
+	/**
+	 * 获取指定部门的实际对象
+	 * 
+	 * @param id
+	 *            部门id
+	 * @return
+	 */
+	public Organization getDepartment(long id);
 }

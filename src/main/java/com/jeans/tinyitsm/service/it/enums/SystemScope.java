@@ -18,16 +18,19 @@ public enum SystemScope implements EnumTitle {
 	}
 
 	public String getTitle(Organization company) {
-		byte type = HrUtil.getCompanyLevel(company);
-		if (type < 0) {
+		return getTitle(HrUtil.getCompanyLevel(company));
+	}
+
+	public String getTitle(byte companyLevel) {
+		if (companyLevel < 0) {
 			return "";
 		}
-		if (type == HRConstants.PROVINCE) {
+		if (companyLevel == HRConstants.PROVINCE) {
 			return titles_prov[this.ordinal()];
 		}
-		if (type == HRConstants.CITY) {
+		if (companyLevel == HRConstants.CITY) {
 			return titles_city[this.ordinal()];
 		}
-		return "本公司";
+		return "本公司";		
 	}
 }

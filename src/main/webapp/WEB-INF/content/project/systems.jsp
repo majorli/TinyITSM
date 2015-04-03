@@ -28,6 +28,7 @@
 			<div class="easyui-layout" data-options="width:'100%',height:'100%'">
 				<div data-options="region:'north',title:'信息系统',height:64,collapsible:false" style="padding:6px;overflow:hidden;">
 					<a id="refresh" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true">刷新</a>
+					<a id="append" class="easyui-linkbutton" data-options="iconCls:'icon-vcard-add',plain:true">新增系统</a>
 				</div>
 				<div data-options="region:'center'"><table id="systems" class="easyui-datagrid"></table></div>
 			</div>

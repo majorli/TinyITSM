@@ -462,4 +462,34 @@ public class HRServiceImpl implements HRService {
 	public Employee getEmployee(long id) {
 		return emplDao.getById(Employee.class, id);
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Organization getCompany(long id) {
+		if (id > 0) {
+			Organization o = deptDao.getById(Organization.class, id);
+			if (o.getType() == HRConstants.COMPANY) {
+				return o;
+			} else {
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Organization getDepartment(long id) {
+		if (id > 0) {
+			Organization o = deptDao.getById(Organization.class, id);
+			if (o.getType() == HRConstants.DEPARTMENT) {
+				return o;
+			} else {
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
 }
