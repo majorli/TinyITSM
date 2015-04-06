@@ -41,9 +41,19 @@ public class ParamsAction extends TinyAction {
 		if (null != company) {
 			byte level = HrUtil.getCompanyLevel(company);
 			if (level == HRConstants.PROVINCE) {
-				//
+				// Private, PrivateAndInferiors, PrivateAndDirectInferiors, DirectInferiors, Inferiors, Custom;
+				items.add(new MenuItem(Integer.toString(SystemScope.Private.ordinal()), SystemScope.Private.getTitle(level)));
+				items.add(new MenuItem(Integer.toString(SystemScope.PrivateAndInferiors.ordinal()), SystemScope.PrivateAndInferiors.getTitle(level)));
+				items.add(new MenuItem(Integer.toString(SystemScope.PrivateAndDirectInferiors.ordinal()), SystemScope.PrivateAndDirectInferiors.getTitle(level)));
+				items.add(new MenuItem(Integer.toString(SystemScope.DirectInferiors.ordinal()), SystemScope.DirectInferiors.getTitle(level)));
+				items.add(new MenuItem(Integer.toString(SystemScope.Inferiors.ordinal()), SystemScope.Inferiors.getTitle(level)));
+				items.add(new MenuItem(Integer.toString(SystemScope.Custom.ordinal()), SystemScope.Custom.getTitle(level)));
 			} else if (level == HRConstants.CITY) {
-				//
+				// Private, PrivateAndInferiors, Inferiors, Custom;
+				items.add(new MenuItem(Integer.toString(SystemScope.Private.ordinal()), SystemScope.Private.getTitle(level)));
+				items.add(new MenuItem(Integer.toString(SystemScope.PrivateAndInferiors.ordinal()), SystemScope.PrivateAndInferiors.getTitle(level)));
+				items.add(new MenuItem(Integer.toString(SystemScope.Inferiors.ordinal()), SystemScope.Inferiors.getTitle(level)));
+				items.add(new MenuItem(Integer.toString(SystemScope.Custom.ordinal()), SystemScope.Custom.getTitle(level)));
 			} else if (level == HRConstants.BRANCH) {
 				items.add(new MenuItem(Integer.toString(SystemScope.Private.ordinal()), SystemScope.Private.getTitle(level)));
 			}

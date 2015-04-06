@@ -52,9 +52,9 @@
 						<label>系统使用者：</label><input id="v_userBrief" class="easyui-textbox" data-options="prompt:'请输入主要用户群体的描述',validType:'length[0,255]',height:30" />
 						<label class="R">系统供应商：</label><input id="v_provider" class="easyui-textbox" data-options="prompt:'请输入系统的供应商/开发商/集成商',validType:'length[0,64]',height:30" />
 					</div>
-						<label>系统使用范围：</label><input id="v_scope" class="easyui-combobox" data-options="url:'',valueField:'id',textField:'text',editable:false,required:true,missingMessage:'使用范围必须选择',height:30" />
-						<label class="R">指定使用范围：</label><input id="v_companiesInScope" class="easyui-combobox" data-options="url:'',valueField:'id',textField:'text',editable:false,height:30" multiple="multiple" />
 					<div class="MidLine">
+						<label>系统使用范围：</label><input id="v_scope" class="easyui-combobox" data-options="url:'project/system-scopes',valueField:'id',textField:'text',value:0,editable:false,height:30" />
+						<span id="d_companiesInScope"><label class="R">指定使用范围：</label><input id="v_companiesInScope" class="easyui-combotree" data-options="url:'hr/get-branches-tree',valueField:'id',textField:'text',editable:false,cascadeCheck:false,height:30,width:320" multiple="multiple" /></span>
 					</div>
 				</form>
 			</div>

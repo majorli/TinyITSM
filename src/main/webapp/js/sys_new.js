@@ -14,5 +14,14 @@ $(function() {
 	/**
 	 * initialize wpad
 	 */
-
+	$("#d_companiesInScope").hide();
+	$("#v_scope").combobox({
+		"onChange" : function(newValue, oldValue) {
+			if (newValue == 5) {
+				$("#d_companiesInScope").show();
+			} else {
+				$("#d_companiesInScope").hide();
+			}
+		}
+	});
 });
