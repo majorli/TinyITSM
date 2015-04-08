@@ -28,7 +28,7 @@
 			<div class="easyui-layout" data-options="height:'100%'">
 				<div data-options="region:'east',title:'资料库TOP10',split:true" style="width:700px">
 					<div class="easyui-layout" data-options="height:'100%'">
-						<div data-options="region:'north',height:36" style="overflow:hidden;padding:4px;">
+						<div data-options="region:'north',height:36,collapsible:false" style="overflow:hidden;padding:4px;">
 							<a id="refresh" class="easyui-linkbutton" data-options="iconCls:'icon-refresh',plain:true">刷新排名</a>
 							<a id="download" class="easyui-linkbutton" data-options="iconCls:'icon-tlb-download',plain:true">下载</a>
 							<a id="subscribe" class="easyui-linkbutton" data-options="iconCls:'icon-tlb-rss',plain:true">订阅</a>

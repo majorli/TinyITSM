@@ -80,15 +80,15 @@ public interface HRService {
 	public List<HRUnit> getOrgTree(long id, OrgTreeType treeType, boolean includeRoot);
 
 	/**
-	 * include sub-organizations or employees according to children type
+	 * include sub-organizations or employees according to children type.<br>
 	 * 
-	 * if the root unit is a department and children type is branches, return empty list;
-	 * if the root unit is a department and children type is sub-organizations, return only sub-departments;
-	 * <!-- if the root unit is the root company(id <= 1) and children type is sub-organizations, exclude branches; -->
-	 * if the root unit is a company and children type is employees or former employees or history departments, return recursive results;
-	 * other conditions, no recusive.
+	 * if the root unit is a department and children type is branches, return empty list;<br>
+	 * if the root unit is a department and children type is sub-organizations, return only sub-departments;<br>
+	 * <!-- if the root unit is the root company(id <= 1) and children type is sub-organizations, exclude branches; --><br>
+	 * if the root unit is a company and children type is employees or former employees or history departments, return recursive results;<br>
+	 * other conditions, no recusive.<br>
 	 * 
-	 * if unit==null or unit is employee or any other exceptions, return empty list
+	 * if unit==null or unit is employee or any other exceptions, return empty list<br>
 	 * 
 	 * @param parentId
 	 * @return list of children units, not tree view

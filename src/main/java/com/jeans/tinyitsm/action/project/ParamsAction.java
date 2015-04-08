@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.jeans.tinyitsm.action.TinyAction;
 import com.jeans.tinyitsm.model.hr.Organization;
+import com.jeans.tinyitsm.model.view.HRUnit;
 import com.jeans.tinyitsm.model.view.MenuItem;
 import com.jeans.tinyitsm.service.hr.HRConstants;
 import com.jeans.tinyitsm.service.hr.HRService;
@@ -56,6 +57,18 @@ public class ParamsAction extends TinyAction {
 				items.add(new MenuItem(Integer.toString(SystemScope.Custom.ordinal()), SystemScope.Custom.getTitle(level)));
 			} else if (level == HRConstants.BRANCH) {
 				items.add(new MenuItem(Integer.toString(SystemScope.Private.ordinal()), SystemScope.Private.getTitle(level)));
+			}
+		}
+		return SUCCESS;
+	}
+
+	@Action(value = "potential-branches", results = { @Result(type = "json", params = { "root", "items" }) })
+	public String potentialBranches() throws Exception {
+		items = new ArrayList<MenuItem>();
+		if (1 == getCurrentCompanyId()) {
+			List<HRUnit> branches = hrService.getCompChildren(getCurrentCompanyId());
+			for (HRUnit branch : branches) {
+				items.add(new MenuItem(Long.toString(branch.getId()), branch.getAlias()));
 			}
 		}
 		return SUCCESS;

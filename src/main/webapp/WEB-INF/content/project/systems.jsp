@@ -30,7 +30,7 @@
 					<a id="refresh" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true">刷新</a>
 					<a id="append" class="easyui-linkbutton" data-options="iconCls:'icon-vcard-add',plain:true">新增系统</a>
 				</div>
-				<div data-options="region:'center'"><table id="systems" class="easyui-datagrid"></table></div>
+				<div data-options="region:'center',border:false"><table id="systems" class="easyui-datagrid"></table></div>
 			</div>
 		</div>
 	</div>

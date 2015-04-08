@@ -59,7 +59,7 @@
 					</div>
 					<div class="MidLine">
 						<label>部署方式：</label><input id="v_deploy" class="easyui-combobox" data-options="data:[{'id':0,'text':'国家局集中'}, {'id':1,'text':'国省两级分布'}, {'id':2,'text':'国省市三级分布'}, {'id':3,'text':'省集中'}, {'id':4,'text':'省市两级分布'}, {'id':5,'text':'市集中'}, {'id':6,'text':'行业外'}, {'id':7,'text':'其他部署方式'}],valueField:'id',textField:'text',value:3,editable:false,height:30" />
-						<label class="R">下属系统分支：</label><input id="v_branches" class="easyui-combobox" data-options="url:'',valueField:'id',textField:'text',editable:false,multiple:true,height:30" />
+						<label class="R">下属系统分支：</label><input id="v_branches" class="easyui-combobox" data-options="url:'project/potential-branches',valueField:'id',textField:'text',editable:false,multiple:true,height:30" />
 					</div>
 					<div class="MidLine">
 						<label>系统建成时间：</label><input id="v_constructedTime" class="easyui-datebox" data-options="height:30" />
@@ -80,7 +80,7 @@
 						<label>系统讨论组：</label><input id="v_wikiOptions" class="easyui-combobox" data-options="data:[{'id':0,'text':'创建一个新的讨论组'},{'id':1,'text':'加入原有的讨论组'}],valueField:'id',textField:'text',value:0,editable:false,height:30" />
 						<span id="d_wikies"><label class="R">原有讨论组：</label><input id="v_wikies" class="easyui-combobox" data-options="url:'',valueField:'id',textField:'text',editable:false,height:30" /></span>
 					</div>
-					<div class="Line">
+					<div style="margin-top:2em;">
 						<a id="f_submit" class="easyui-linkbutton" data-options="iconCls:'icon-saved'" style="padding:2px 6px;">提交</a>
 						<a id="f_reset" class="easyui-linkbutton" data-options="iconCls:'icon-forbid'" style="padding:2px 6px;">重填</a>
 					</div>
