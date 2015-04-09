@@ -21,6 +21,8 @@ import javax.persistence.Table;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
+import com.jeans.tinyitsm.model.hr.Organization;
+import com.jeans.tinyitsm.service.hr.HRConstants;
 import com.jeans.tinyitsm.service.it.enums.ProjectStage;
 import com.jeans.tinyitsm.service.it.enums.ProjectType;
 
@@ -36,7 +38,8 @@ import com.jeans.tinyitsm.service.it.enums.ProjectType;
 public class Project implements Serializable {
 	private long id;
 	private String name;
-	private Set<System> systems = new HashSet<System>();
+	private Organization owner;
+	private Set<ITSystem> systems = new HashSet<ITSystem>();
 	private ProjectType type;
 	private ProjectStage stage;
 	private String constructor;
@@ -64,22 +67,34 @@ public class Project implements Serializable {
 		this.name = name;
 	}
 
+	@ManyToOne
+	@JoinColumn(nullable = false, name = "owner_org_id", foreignKey = @ForeignKey(name = "FK_PRJ_OWNER"))
+	public Organization getOwner() {
+		return owner;
+	}
+
+	public void setOwner(Organization owner) {
+		if (owner.getType() == HRConstants.COMPANY) {
+			this.owner = owner;
+		}
+	}
+
 	@OneToMany(mappedBy = "project")
-	public Set<System> getSystems() {
+	public Set<ITSystem> getSystems() {
 		return systems;
 	}
 
-	public void setSystems(Set<System> systems) {
+	public void setSystems(Set<ITSystem> systems) {
 		this.systems = systems;
 	}
 
-	public void addSystem(System system) {
+	public void addSystem(ITSystem system) {
 		if (null != system) {
 			this.systems.add(system);
 		}
 	}
 
-	public void removeSystem(System system) {
+	public void removeSystem(ITSystem system) {
 		this.systems.remove(system);
 	}
 

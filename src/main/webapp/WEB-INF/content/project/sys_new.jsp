@@ -69,12 +69,12 @@
 					<div class="MidLine">
 						<label>系统建设项目：</label><input id="v_prjOptions" class="easyui-combobox" data-options="data:[{'id':0,'text':'不关联系统建设项目'},{'id':1,'text':'创建一个新的建设项目'},{'id':2,'text':'合并入原有的建设项目'}],valueField:'id',textField:'text',value:0,editable:false,height:30" />
 						<span id="d_newPrj"><label class="R">建设项目名称：</label><input id="v_newPrjName" class="easyui-textbox" data-options="prompt:'请输入新建的系统建设项目名称',validType:'length[0,64]',height:30" /></span>
-						<span id="d_oldPrj"><label class="R">原有建设项目：</label><input id="v_oldPrjs" class="easyui-combobox" data-options="url:'',valueField:'id',textField:'text',editable:false,height:30" /></span>
+						<span id="d_oldPrj"><label class="R">原有建设项目：</label><input id="v_oldPrjs" class="easyui-combobox" data-options="url:'project/prj-list',valueField:'id',textField:'text',editable:false,height:30" /></span>
 					</div>
 					<div class="MidLine">
 						<label>系统运维项目：</label><input id="v_mtnOptions" class="easyui-combobox" data-options="data:[{'id':0,'text':'不关联系统运维项目'},{'id':1,'text':'创建一个新的运维项目'},{'id':2,'text':'合并入原有的运维项目'}],valueField:'id',textField:'text',value:0,editable:false,height:30" />
 						<span id="d_newMtn"><label class="R">运维项目名称：</label><input id="v_newMtnName" class="easyui-textbox" data-options="prompt:'请输入新建的系统运维项目名称',validType:'length[0,64]',height:30" /></span>
-						<span id="d_oldMtn"><label class="R">原有运维项目：</label><input id="v_oldMtns" class="easyui-combobox" data-options="url:'',valueField:'id',textField:'text',editable:false,height:30" /></span>
+						<span id="d_oldMtn"><label class="R">原有运维项目：</label><input id="v_oldMtns" class="easyui-combobox" data-options="url:'maintain/mtn-list',valueField:'id',textField:'text',editable:false,height:30" /></span>
 					</div>
 					<div class="MidLine">
 						<label>系统讨论组：</label><input id="v_wikiOptions" class="easyui-combobox" data-options="data:[{'id':0,'text':'创建一个新的讨论组'},{'id':1,'text':'加入原有的讨论组'}],valueField:'id',textField:'text',value:0,editable:false,height:30" />

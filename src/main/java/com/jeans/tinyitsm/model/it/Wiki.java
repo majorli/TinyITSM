@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,7 +21,8 @@ import com.jeans.tinyitsm.model.it.post.Page;
 public class Wiki implements Serializable {
 
 	private long id;
-	private Set<System> systems = new HashSet<System>();
+	private String name;
+	private Set<ITSystem> systems = new HashSet<ITSystem>();
 	private List<Page> pages = new ArrayList<Page>();
 
 	@Id
@@ -33,22 +35,31 @@ public class Wiki implements Serializable {
 		this.id = id;
 	}
 
+	@Column(nullable = false, length = 64)
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	@OneToMany(mappedBy = "wiki")
-	public Set<System> getSystems() {
+	public Set<ITSystem> getSystems() {
 		return systems;
 	}
 
-	public void setSystems(Set<System> systems) {
+	public void setSystems(Set<ITSystem> systems) {
 		this.systems = systems;
 	}
 
-	public void addSystem(System system) {
+	public void addSystem(ITSystem system) {
 		if (null != system) {
 			this.systems.add(system);
 		}
 	}
 
-	public void removeSystem(System system) {
+	public void removeSystem(ITSystem system) {
 		this.systems.remove(system);
 	}
 
@@ -76,6 +87,7 @@ public class Wiki implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
 
@@ -90,13 +102,18 @@ public class Wiki implements Serializable {
 		Wiki other = (Wiki) obj;
 		if (id != other.id)
 			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("Wiki [id=").append(id).append(", systems=").append(systems).append("]");
+		builder.append("Wiki [id=").append(id).append(", name=").append(name).append(", systems=").append(systems).append("]");
 		return builder.toString();
 	}
 }

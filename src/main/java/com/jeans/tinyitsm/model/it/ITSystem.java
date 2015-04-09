@@ -34,7 +34,7 @@ import com.jeans.tinyitsm.service.it.enums.SystemType;
 @Entity
 @Table(name = "systems")
 @Indexed
-public class System implements Serializable {
+public class ITSystem implements Serializable {
 
 	private long id;
 	private String name;
@@ -330,7 +330,7 @@ public class System implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		System other = (System) obj;
+		ITSystem other = (ITSystem) obj;
 		if (abandonedTime == null) {
 			if (other.abandonedTime != null)
 				return false;

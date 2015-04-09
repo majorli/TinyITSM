@@ -29,7 +29,7 @@ import com.jeans.tinyitsm.service.it.enums.SystemStage;
 public class SystemBranch implements Serializable {
 
 	private long id;
-	private System system;
+	private ITSystem system;
 	private Organization company;
 	private Employee administrator;
 	private Set<Asset> components = new HashSet<Asset>();
@@ -49,11 +49,11 @@ public class SystemBranch implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(nullable = false, name = "system_id", foreignKey = @ForeignKey(name = "FK_SYS_BRANCH"))
-	public System getSystem() {
+	public ITSystem getSystem() {
 		return system;
 	}
 
-	public void setSystem(System system) {
+	public void setSystem(ITSystem system) {
 		this.system = system;
 	}
 
