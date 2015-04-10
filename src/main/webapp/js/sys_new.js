@@ -11,6 +11,34 @@ $(function() {
 	 */
 	$.initNavi("sys_new");
 
+	var page = {
+		"reset" : function() {
+			$("#v_type").combobox("setValue", 0);
+			$("#v_stage").combobox("setValue", 0);
+			$("#v_name").textbox("clear");
+			$("#v_alias").textbox("clear");
+			$("#v_modelOrVersion").textbox("clear");
+			$("#v_brief").textbox("clear");
+			$("#v_securityLevel").combobox("setValue", 0);
+			$("#v_userBrief").textbox("clear");
+			$("#v_provider").textbox("clear");
+			$("#v_scope").combobox("setValue", 0);
+			$("#v_companiesInScope").combotree("clear");
+			$("#v_deploy").combobox("setValue", 3);
+			$("#v_branches").combobox("clear");
+			$("#v_constructedTime").datebox("clear");
+			$("#v_freeMaintainMonths").numberspinner("clear");
+			$("#v_prjOptions").combobox("setValue", 0);
+			$("#v_mtnOptions").combobox("setValue", 0);
+			$("#v_wikiOptions").combobox("setValue", 0);
+			$("#v_oldPrjs").combobox("clear");
+			$("#v_oldMtns").combobox("clear");
+			$("#v_wikies").combobox("clear");
+			$("#v_newPrjName").textbox("clear");
+			$("#v_newMtnName").textbox("clear");
+			$("#v_newWikiName").textbox("clear");
+		}
+	};
 	/**
 	 * initialize wpad
 	 */
@@ -20,6 +48,7 @@ $(function() {
 			if (newValue == 5) {
 				$("#d_companiesInScope").show();
 			} else {
+				$("#v_companiesInScope").combotree("clear");
 				$("#d_companiesInScope").hide();
 			}
 		}
@@ -31,6 +60,16 @@ $(function() {
 			} else {
 				$("#v_constructedTime").datebox("clear");
 				$("#v_constructedTime").datebox("disable");
+			}
+		}
+	});
+	$("#v_securityLevel").combobox({
+		"onChange" : function(newValue, oldValue) {
+			if (newValue == 0) {
+				$("#v_securityCode").textbox("clear");
+				$("#v_securityCode").textbox("disable");
+			} else {
+				$("#v_securityCode").textbox("enable");
 			}
 		}
 	});
@@ -57,10 +96,13 @@ $(function() {
 	$("#v_wikiOptions").combobox({
 		"onChange" : function(newValue, oldValue) {
 			if (newValue == 0) {
+				$("#d_newWiki").show();
 				$("#d_wikies").hide();
 			} else {
+				$("#d_newWiki").hide();
 				$("#d_wikies").show();
 			}
 		}
 	});
+	$("#f_reset").on("click", page.reset);
 });

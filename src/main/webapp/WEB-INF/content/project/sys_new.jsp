@@ -34,8 +34,8 @@
 				<form action="" method="post" id="newSystem">
 					<h4>系统基本信息</h4>
 					<div class="MidLine">
-						<label>系统类别：</label><input id="v_type" class="easyui-combobox" data-options="data:[{'id':0,'text':'基础设施'}, {'id':1,'text':'信息网络系统'}, {'id':2,'text':'信息安全系统'}, {'id':3,'text':'核心平台'}, {'id':4,'text':'虚拟化/云系统'}, {'id':5,'text':'硬件平台'}, {'id':6,'text':'软件平台'}, {'id':7,'text':'数据分析系统'}, {'id':8,'text':'移动应用'}, {'id':9,'text':'业务应用系统'}, {'id':10,'text':'作业类系统'}, {'id':11,'text':'信息化工具'}, {'id':12,'text':'桌面办公系统'}, {'id':13,'text':'其他信息系统'}],valueField:'id',textField:'text',editable:false,required:true,missingMessage:'系统类别必须选择',height:30" />
-						<label class="R">系统状态：</label><input id="v_stage" class="easyui-combobox" data-options="data:[{'id':0,'text':'建成（系统已经建成并完成最终验收）'},{'id':1,'text':'在建（尚未完成项目建设和验收）'}],valueField:'id',textField:'text',value:0,editable:false,height:30" />
+						<label>系统类别：</label><input id="v_type" class="easyui-combobox" data-options="data:[{'id':0,'text':'基础设施'}, {'id':1,'text':'信息网络系统'}, {'id':2,'text':'信息安全系统'}, {'id':3,'text':'核心平台'}, {'id':4,'text':'虚拟化/云系统'}, {'id':5,'text':'硬件平台'}, {'id':6,'text':'软件平台'}, {'id':7,'text':'数据分析系统'}, {'id':8,'text':'移动应用'}, {'id':9,'text':'业务应用系统'}, {'id':10,'text':'作业类系统'}, {'id':11,'text':'信息化工具'}, {'id':12,'text':'桌面办公系统'}, {'id':13,'text':'其他信息系统'}],valueField:'id',textField:'text',editable:false,height:30" />
+						<label class="R">系统状态：</label><input id="v_stage" class="easyui-combobox" data-options="data:[{'id':0,'text':'建成（系统已经建成并完成最终验收）'},{'id':1,'text':'在建（尚未完成项目建设和验收）'}],valueField:'id',textField:'text',editable:false,height:30" />
 					</div>
 					<div class="MidLine">
 						<label>系统名称：</label><input id="v_name" class="easyui-textbox" data-options="prompt:'请输入系统名称',validType:'length[0,64]',required:true,missingMessage:'系统名称必须填写',height:30" />
@@ -46,8 +46,8 @@
 						<label class="R">功能与用途：</label><input id="v_brief" class="easyui-textbox" data-options="prompt:'请输入系统功能与用途简介',validType:'length[0,255]',height:30" />
 					</div>
 					<div class="MidLine">
-						<label>等级保护级别：</label><input id="v_securityLevel" class="easyui-combobox" data-options="data:[{'id':0,'text':'未定级'}, {'id':1,'text':'一级'}, {'id':2,'text':'二级'}, {'id':3,'text':'三级'}],valueField:'id',textField:'text',editable:false,required:true,missingMessage:'等保级别必须选择',height:30" />
-						<label class="R">等保备案号：</label><input id="v_brief" class="easyui-textbox" data-options="prompt:'请输入系统功能与用途简介',validType:'length[0,32]',height:30" />
+						<label>等级保护级别：</label><input id="v_securityLevel" class="easyui-combobox" data-options="data:[{'id':0,'text':'未定级'}, {'id':1,'text':'一级'}, {'id':2,'text':'二级'}, {'id':3,'text':'三级'}],valueField:'id',textField:'text',editable:false,height:30" />
+						<label class="R">等保备案号：</label><input id="v_securityCode" class="easyui-textbox" data-options="prompt:'请输入等保备案编号',disabled:true,validType:'length[0,32]',height:30" />
 					</div>
 					<div class="MidLine">
 						<label>系统使用者：</label><input id="v_userBrief" class="easyui-textbox" data-options="prompt:'请输入主要用户群体的描述',validType:'length[0,255]',height:30" />
@@ -78,7 +78,8 @@
 					</div>
 					<div class="MidLine">
 						<label>系统讨论组：</label><input id="v_wikiOptions" class="easyui-combobox" data-options="data:[{'id':0,'text':'创建一个新的讨论组'},{'id':1,'text':'加入原有的讨论组'}],valueField:'id',textField:'text',value:0,editable:false,height:30" />
-						<span id="d_wikies"><label class="R">原有讨论组：</label><input id="v_wikies" class="easyui-combobox" data-options="url:'',valueField:'id',textField:'text',editable:false,height:30" /></span>
+						<span id="d_newWiki"><label class="R">讨论组名称：</label><input id="v_newWikiName" class="easyui-textbox" data-options="prompt:'请输入新建的系统讨论组名称',validType:'length[0,64]',height:30" /></span>
+						<span id="d_wikies"><label class="R">原有讨论组：</label><input id="v_wikies" class="easyui-combobox" data-options="url:'maintain/wiki-list',valueField:'id',textField:'text',editable:false,height:30" /></span>
 					</div>
 					<div style="margin-top:2em;">
 						<a id="f_submit" class="easyui-linkbutton" data-options="iconCls:'icon-saved'" style="padding:2px 6px;">提交</a>
